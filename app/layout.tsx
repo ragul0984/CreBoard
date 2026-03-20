@@ -6,7 +6,7 @@ import Header from "../components/Header";
 import StoreInitializer from "../components/StoreInitializer";
 
 export const metadata: Metadata = {
-  title: "Creator OS",
+  title: "CreBoard",
   description: "Creator management dashboard",
 };
 

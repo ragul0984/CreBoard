@@ -20,7 +20,7 @@ export default function Sidebar() {
     <aside className="w-[220px] border-r border-border bg-card h-screen flex flex-col py-6 sticky top-0 shrink-0">
       <div className="px-5 mb-8 flex items-center gap-3">
         <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-sm">C</div>
-        <span className="text-lg font-semibold tracking-tight">Creator OS</span>
+        <span className="text-lg font-semibold tracking-tight">CreBoard</span>
       </div>
       <nav className="flex-1 px-3 space-y-1">
         {links.map((link) => {

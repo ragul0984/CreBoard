@@ -27,7 +27,10 @@ export function RevenueLineChart({ data = [] }: { data?: any[] }) {
           <Tooltip 
             cursor={{ stroke: 'var(--border-color)', strokeWidth: 1, strokeDasharray: '5 5' }}
             contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border-color)', borderRadius: '12px', color: 'var(--fg)', fontSize: '13px', fontWeight: 600, padding: '12px' }}
-            formatter={(value: number) => [`₹${value.toLocaleString()}`, 'Revenue']}
+            formatter={(value) => {
+              const safeValue = Number(value ?? 0)
+              return [`₹${safeValue.toLocaleString()}`, 'Revenue']
+            }}
             labelStyle={{ color: '#6b7280', marginBottom: '8px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.05em' }}
           />
           <Line 
