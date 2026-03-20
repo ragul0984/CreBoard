@@ -1,26 +1,58 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
+  --color-card: var(--card);
+  --color-border: var(--border-color);
+  
+  --color-primary: #6366f1;
+  --color-primary-hover: #4f46e5;
+  
+  --color-success-bg: var(--success-bg);
+  --color-success-text: var(--success-text);
+  
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-text: var(--warning-text);
+  
+  --color-danger-bg: var(--danger-bg);
+  --color-danger-text: var(--danger-text);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --bg: #f8fafc;
+  --fg: #0f172a;
+  --card: #ffffff;
+  --border-color: #e2e8f0;
+  
+  --success-bg: #d1fae5;
+  --success-text: #059669;
+  
+  --warning-bg: #fef3c7;
+  --warning-text: #d97706;
+  
+  --danger-bg: #fee2e2;
+  --danger-text: #dc2626;
+}
+
+.dark {
+  --bg: #0b0c10;
+  --fg: #f8fafc;
+  --card: #13151b;
+  --border-color: #1f232b;
+  
+  --success-bg: #064e3b;
+  --success-text: #34d399;
+  
+  --warning-bg: #78350f;
+  --warning-text: #fbbf24;
+  
+  --danger-bg: #7f1d1d;
+  --danger-text: #f87171;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
