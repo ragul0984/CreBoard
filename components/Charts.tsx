@@ -7,7 +7,7 @@ export function MonthlyRevenueChart({ data }: { data: any[] }) {
   return (
     <div className="w-full h-full min-h-[220px] mt-4">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+        <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 25 }}>
           <XAxis 
             dataKey="name" 
             axisLine={false} 
