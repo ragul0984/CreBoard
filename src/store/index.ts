@@ -74,10 +74,11 @@ export const useStore = create<AppState>((set, get) => ({
     if (get().isInitialized) return;
 
     try {
-      const [dealsRes, paymentsRes, revenueRes] = await Promise.all([
+      const [dealsRes, paymentsRes, revenueRes, brandsRes] = await Promise.all([
         supabase.from('deals').select('*').order('deadline', { ascending: true }),
         supabase.from('payments').select('*').order('due_date', { ascending: true }),
-        supabase.from('revenue').select('*').order('date', { ascending: false })
+        supabase.from('revenue').select('*').order('date', { ascending: false }),
+        supabase.from('brands').select('*').order('name', { ascending: true })
       ]);
 
       const fetchedDeals: Deal[] = (dealsRes.data || []).map(d => ({
@@ -117,10 +118,21 @@ export const useStore = create<AppState>((set, get) => ({
         payment_id: r.payment_id
       }));
 
+      const fetchedBrands: BrandProfile[] = (brandsRes.data || []).map(b => ({
+        id: b.id,
+        name: b.name,
+        contactPerson: b.contact_person || 'Unknown',
+        platform: b.platform || 'Other',
+        industry: b.industry || 'Other',
+        rating: b.rating || 3,
+        notes: b.notes || []
+      }));
+
       set({
         deals: fetchedDeals,
         payments: fetchedPayments,
         revenue: fetchedRevenue,
+        brands: fetchedBrands,
         isInitialized: true
       });
     } catch (error) {
@@ -128,8 +140,37 @@ export const useStore = create<AppState>((set, get) => ({
     }
   },
   
-  addBrand: (brand) => set((state) => ({ brands: [...state.brands, brand] })),
-  updateBrand: (id, updates) => set((state) => ({ brands: state.brands.map(b => b.id === id ? { ...b, ...updates } : b) })),
+  addBrand: async (brand) => {
+    const safeBrand = { ...brand, id: brand.id.includes('_') || brand.id.length < 32 ? crypto.randomUUID() : brand.id };
+    
+    set((state) => ({ brands: [...state.brands, safeBrand] }));
+    
+    await supabase.from('brands').insert([{
+      id: safeBrand.id,
+      name: safeBrand.name,
+      contact_person: safeBrand.contactPerson,
+      platform: safeBrand.platform,
+      industry: safeBrand.industry,
+      rating: safeBrand.rating,
+      notes: safeBrand.notes
+    }]);
+  },
+
+  updateBrand: async (id, updates) => {
+    set((state) => ({ brands: state.brands.map(b => b.id === id ? { ...b, ...updates } : b) }));
+    
+    const dbUpdates: any = {};
+    if (updates.name !== undefined) dbUpdates.name = updates.name;
+    if (updates.contactPerson !== undefined) dbUpdates.contact_person = updates.contactPerson;
+    if (updates.platform !== undefined) dbUpdates.platform = updates.platform;
+    if (updates.industry !== undefined) dbUpdates.industry = updates.industry;
+    if (updates.rating !== undefined) dbUpdates.rating = updates.rating;
+    if (updates.notes !== undefined) dbUpdates.notes = updates.notes;
+
+    if (Object.keys(dbUpdates).length > 0) {
+      await supabase.from('brands').update(dbUpdates).eq('id', id);
+    }
+  },
   addContentTask: (task) => set((state) => ({ contentTasks: [...state.contentTasks, task] })),
   updateContentTaskStatus: (id, status) => set((state) => ({ contentTasks: state.contentTasks.map(t => t.id === id ? { ...t, status } : t) })),
 
@@ -138,24 +179,20 @@ export const useStore = create<AppState>((set, get) => ({
     const safeId = deal.id.includes('_') || deal.id.length < 32 ? crypto.randomUUID() : deal.id;
     const safeDeal = { ...deal, id: safeId };
 
-    set((state) => {
-       const newState: any = { deals: [...state.deals, safeDeal] };
-       
-       const brandExists = state.brands.some(b => b.name.toLowerCase() === safeDeal.brand.toLowerCase());
-       if (!brandExists) {
-           newState.brands = [...state.brands, {
-               id: crypto.randomUUID(),
-               name: safeDeal.brand,
-               contactPerson: 'Unknown',
-               platform: safeDeal.platform,
-               industry: 'Other',
-               rating: 3,
-               notes: []
-           }];
-       }
-       
-       return newState;
-    });
+    set((state) => ({ deals: [...state.deals, safeDeal] }));
+
+    const brandExists = get().brands.some(b => b.name.toLowerCase() === safeDeal.brand.toLowerCase());
+    if (!brandExists) {
+        get().addBrand({
+            id: crypto.randomUUID(),
+            name: safeDeal.brand,
+            contactPerson: 'Unknown',
+            platform: safeDeal.platform,
+            industry: 'Other',
+            rating: 3,
+            notes: []
+        });
+    }
     
     const { error } = await supabase.from('deals').insert([{
       id: safeId,
@@ -368,7 +405,8 @@ export const useStore = create<AppState>((set, get) => ({
     await supabase.from('revenue').delete().eq('id', id);
   },
 
-  deleteBrand: (id) => {
+  deleteBrand: async (id) => {
     set(state => ({ brands: state.brands.filter(b => b.id !== id) }));
+    await supabase.from('brands').delete().eq('id', id);
   }
 }));
