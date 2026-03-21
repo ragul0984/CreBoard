@@ -6,6 +6,7 @@ export default function StoreInitializer() {
   const initializeStore = useStore(s => s.initializeStore);
   
   useEffect(() => {
+    console.log('🚀 StoreInitializer mounted');
     initializeStore();
   }, [initializeStore]);
 
