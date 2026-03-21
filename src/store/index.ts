@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { supabase } from '../lib/supabase';
+import { createClient } from '@/src/utils/supabase/client';
 
 export type Deal = {
   id: string; brand: string; platform: string; deliverable: string; value: number; deadline: string; stage: string;
@@ -73,12 +73,17 @@ export const useStore = create<AppState>((set, get) => ({
   initializeStore: async () => {
     if (get().isInitialized) return;
 
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
     try {
-      const [dealsRes, paymentsRes, revenueRes, brandsRes] = await Promise.all([
+      const [dealsRes, paymentsRes, revenueRes, brandsRes, tasksRes] = await Promise.all([
         supabase.from('deals').select('*').order('deadline', { ascending: true }),
         supabase.from('payments').select('*').order('due_date', { ascending: true }),
         supabase.from('revenue').select('*').order('date', { ascending: false }),
-        supabase.from('brands').select('*').order('name', { ascending: true })
+        supabase.from('brands').select('*').order('name', { ascending: true }),
+        supabase.from('content_tasks').select('*').order('due_date', { ascending: true })
       ]);
 
       const fetchedDeals: Deal[] = (dealsRes.data || []).map(d => ({
@@ -125,7 +130,17 @@ export const useStore = create<AppState>((set, get) => ({
         platform: b.platform || 'Other',
         industry: b.industry || 'Other',
         rating: b.rating || 3,
-        notes: b.notes || []
+        notes: Array.isArray(b.notes) ? b.notes : []
+      }));
+
+      const fetchedTasks: ContentTask[] = (tasksRes.data || []).map(t => ({
+        id: t.id,
+        title: t.title,
+        platform: t.platform || 'Other',
+        type: t.type || 'Other',
+        status: t.status as any,
+        due_date: t.due_date,
+        dueDate: t.due_date // syncing camelCase
       }));
 
       set({
@@ -133,6 +148,7 @@ export const useStore = create<AppState>((set, get) => ({
         payments: fetchedPayments,
         revenue: fetchedRevenue,
         brands: fetchedBrands,
+        contentTasks: fetchedTasks,
         isInitialized: true
       });
     } catch (error) {
@@ -141,6 +157,7 @@ export const useStore = create<AppState>((set, get) => ({
   },
   
   addBrand: async (brand) => {
+    const supabase = createClient();
     const safeBrand = { ...brand, id: brand.id.includes('_') || brand.id.length < 32 ? crypto.randomUUID() : brand.id };
     
     set((state) => ({ brands: [...state.brands, safeBrand] }));
@@ -157,6 +174,7 @@ export const useStore = create<AppState>((set, get) => ({
   },
 
   updateBrand: async (id, updates) => {
+    const supabase = createClient();
     set((state) => ({ brands: state.brands.map(b => b.id === id ? { ...b, ...updates } : b) }));
     
     const dbUpdates: any = {};
@@ -171,10 +189,30 @@ export const useStore = create<AppState>((set, get) => ({
       await supabase.from('brands').update(dbUpdates).eq('id', id);
     }
   },
-  addContentTask: (task) => set((state) => ({ contentTasks: [...state.contentTasks, task] })),
-  updateContentTaskStatus: (id, status) => set((state) => ({ contentTasks: state.contentTasks.map(t => t.id === id ? { ...t, status } : t) })),
+  addContentTask: async (task) => {
+    const supabase = createClient();
+    const safeId = crypto.randomUUID();
+    const safeTask = { ...task, id: safeId };
+    
+    set((state) => ({ contentTasks: [...state.contentTasks, safeTask] }));
+    
+    await supabase.from('content_tasks').insert([{
+      id: safeId,
+      title: safeTask.title,
+      platform: safeTask.platform,
+      type: safeTask.type,
+      status: safeTask.status,
+      due_date: safeTask.dueDate
+    }]);
+  },
+  updateContentTaskStatus: async (id, status) => {
+    const supabase = createClient();
+    set((state) => ({ contentTasks: state.contentTasks.map(t => t.id === id ? { ...t, status } : t) }));
+    await supabase.from('content_tasks').update({ status }).eq('id', id);
+  },
 
   addDeal: async (deal) => {
+    const supabase = createClient();
     // Generate true UUIDv4 if UI didn't provide one
     const safeId = deal.id.includes('_') || deal.id.length < 32 ? crypto.randomUUID() : deal.id;
     const safeDeal = { ...deal, id: safeId };
@@ -209,6 +247,7 @@ export const useStore = create<AppState>((set, get) => ({
   },
   
   updateDealStage: async (id, stage) => {
+    const supabase = createClient();
     const originalDeals = get().deals;
     const isCompleted = stage === 'Paid' || stage === 'Delivered';
 
@@ -311,6 +350,7 @@ export const useStore = create<AppState>((set, get) => ({
   },
 
   addRevenue: async (record) => {
+    const supabase = createClient();
     const safeId = record.id.includes('_') || record.id.length < 32 ? crypto.randomUUID() : record.id;
     const safeRecord = { ...record, id: safeId };
 
@@ -327,6 +367,7 @@ export const useStore = create<AppState>((set, get) => ({
   },
 
   markPaymentReceived: async (id, date) => {
+     const supabase = createClient();
      const payment = get().payments.find(p => p.id === id);
      if (!payment) return;
 
@@ -375,6 +416,7 @@ export const useStore = create<AppState>((set, get) => ({
   },
 
   deleteDeal: async (id) => {
+    const supabase = createClient();
     const payment = get().payments.find(p => p.dealId === id);
     const paymentId = payment?.id;
 
@@ -392,6 +434,7 @@ export const useStore = create<AppState>((set, get) => ({
   },
 
   deletePayment: async (id) => {
+    const supabase = createClient();
     set(state => ({
       payments: state.payments.filter(p => p.id !== id),
       revenue: state.revenue.filter(r => r.payment_id !== id)
@@ -401,11 +444,13 @@ export const useStore = create<AppState>((set, get) => ({
   },
 
   deleteRevenue: async (id) => {
+    const supabase = createClient();
     set(state => ({ revenue: state.revenue.filter(r => r.id !== id) }));
     await supabase.from('revenue').delete().eq('id', id);
   },
 
   deleteBrand: async (id) => {
+    const supabase = createClient();
     set(state => ({ brands: state.brands.filter(b => b.id !== id) }));
     await supabase.from('brands').delete().eq('id', id);
   }
