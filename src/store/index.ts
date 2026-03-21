@@ -42,6 +42,7 @@ interface AppState {
   contracts: Contract[];
   contentTasks: ContentTask[];
   brands: BrandProfile[];
+  userId: string | null;
 
   initializeStore: () => Promise<void>;
 
@@ -69,6 +70,7 @@ export const useStore = create<AppState>((set, get) => ({
   brands: [],
   contracts: [],
   contentTasks: [],
+  userId: null,
 
   initializeStore: async () => {
     console.log('📦 Calling initializeStore...');
@@ -160,6 +162,7 @@ export const useStore = create<AppState>((set, get) => ({
         revenue: fetchedRevenue,
         brands: fetchedBrands,
         contentTasks: fetchedTasks,
+        userId: user.id,
         isInitialized: true
       });
       console.log('Store initialized with data from Supabase');
@@ -176,6 +179,7 @@ export const useStore = create<AppState>((set, get) => ({
     
     await supabase.from('brands').insert([{
       id: safeBrand.id,
+      user_id: get().userId,
       name: safeBrand.name,
       contact_person: safeBrand.contactPerson,
       platform: safeBrand.platform,
@@ -210,6 +214,7 @@ export const useStore = create<AppState>((set, get) => ({
     
     await supabase.from('content_tasks').insert([{
       id: safeId,
+      user_id: get().userId,
       title: safeTask.title,
       platform: safeTask.platform,
       type: safeTask.type,
@@ -246,6 +251,7 @@ export const useStore = create<AppState>((set, get) => ({
     
     const { error } = await supabase.from('deals').insert([{
       id: safeId,
+      user_id: get().userId,
       brand: safeDeal.brand,
       value: safeDeal.value,
       status: safeDeal.stage,
@@ -305,7 +311,15 @@ export const useStore = create<AppState>((set, get) => ({
                 amount: dealThatMoved.value, status: 'Paid', dueDate: dealThatMoved.deadline, receivedDate: today
             }, ...state.payments]
           }));
-          await supabase.from('payments').insert([newPaymentRequest]);
+          await supabase.from('payments').insert([{
+            id: paymentId,
+            user_id: get().userId,
+            deal_id: dealThatMoved.id,
+            amount: dealThatMoved.value,
+            status: 'Paid',
+            due_date: dealThatMoved.deadline,
+            received_date: today
+          }]);
        }
 
        // Ensure Revenue exists
@@ -313,7 +327,7 @@ export const useStore = create<AppState>((set, get) => ({
        if (!alreadyHasRevenue) {
           const revId = crypto.randomUUID();
           const newRev = {
-             id: revId, source: 'deal', payment_id: paymentId,
+             id: revId, user_id: get().userId, source: 'deal', payment_id: paymentId,
              platform: dealThatMoved.platform, type: 'Sponsorship',
              amount: dealThatMoved.value, date: today, notes: `Deal: ${dealThatMoved.brand}`
           };
@@ -340,7 +354,7 @@ export const useStore = create<AppState>((set, get) => ({
             }, ...state.payments]
           }));
           await supabase.from('payments').insert([{
-            id: pId, deal_id: dealThatMoved.id, amount: dealThatMoved.value,
+            id: pId, user_id: get().userId, deal_id: dealThatMoved.id, amount: dealThatMoved.value,
             status: 'Pending', due_date: dealThatMoved.deadline, received_date: null
           }]);
        }
@@ -374,6 +388,7 @@ export const useStore = create<AppState>((set, get) => ({
     set((state) => ({ revenue: [safeRecord, ...state.revenue] }));
     await supabase.from('revenue').insert([{
       id: safeId,
+      user_id: get().userId,
       date: safeRecord.date,
       platform: safeRecord.platform,
       type: safeRecord.type,
