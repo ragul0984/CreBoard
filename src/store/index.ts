@@ -255,7 +255,12 @@ export const useStore = create<AppState>((set, get) => ({
       is_completed: safeDeal.isCompleted || false
     }]);
 
-    if (error) console.error('Error inserting deal:', error);
+    if (error) {
+       console.error('❌ Error inserting deal:', error);
+       alert(`Database Error: ${error.message} (${error.code})`);
+    } else {
+       console.log('✅ Deal saved to Supabase');
+    }
   },
   
   updateDealStage: async (id, stage) => {
