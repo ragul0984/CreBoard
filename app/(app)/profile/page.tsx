@@ -98,9 +98,12 @@ export default function ProfilePage() {
             <p className="text-2xl font-black text-foreground">{activeDeals}</p>
           </div>
 
-          <button className="w-full py-4 bg-foreground text-background font-bold rounded-2xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+          <a 
+            href="mailto:creboard.support@gmail.com"
+            className="w-full py-4 bg-foreground text-background font-bold rounded-2xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+          >
             Support Center <ExternalLink size={16} />
-          </button>
+          </a>
         </div>
       </div>
     </div>
