@@ -58,7 +58,7 @@ export default function LandingPage() {
               <a key={link.label} href={link.href} className="text-[13px] text-[#888] hover:text-[#f5f5f5] transition-colors font-medium tracking-wide lowercase">{link.label}</a>
             ))}
           </div>
-          <Link href="/dashboard" className="px-6 py-2.5 bg-[#f5f5f5] text-black text-[13px] font-bold rounded-full hover:bg-[#e0e0e0] transition-all flex items-center gap-2 uppercase tracking-widest">
+          <Link href="/login" className="px-6 py-2.5 bg-[#f5f5f5] text-black text-[13px] font-bold rounded-full hover:bg-[#e0e0e0] transition-all flex items-center gap-2 uppercase tracking-widest">
             Dashboard <ArrowRight size={14} />
           </Link>
         </div>
@@ -80,7 +80,7 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <Link href="/dashboard" className="px-10 py-4 bg-[#f5f5f5] text-black font-bold rounded-xl hover:bg-white transition-all text-sm uppercase tracking-widest flex items-center gap-2">
+            <Link href="/login" className="px-10 py-4 bg-[#f5f5f5] text-black font-bold rounded-xl hover:bg-white transition-all text-sm uppercase tracking-widest flex items-center gap-2">
               Start Building <ArrowRight size={16} />
             </Link>
             <a href="#features" className="px-10 py-4 border border-[#1a1a1a] text-[#f5f5f5] font-bold rounded-xl hover:bg-[#111] transition-all text-sm uppercase tracking-widest">
