@@ -151,6 +151,7 @@ export const useStore = create<AppState>((set, get) => ({
         contentTasks: fetchedTasks,
         isInitialized: true
       });
+      console.log('Store initialized with data from Supabase');
     } catch (error) {
       console.error('Failed to fetch from Supabase:', error);
     }
@@ -260,92 +261,92 @@ export const useStore = create<AppState>((set, get) => ({
     const dealThatMoved = get().deals.find(d => d.id === id);
     if (!dealThatMoved) return;
 
-    if (stage === 'Paid' || stage === 'Delivered') {
-       const existingPayment = get().payments.find(p => p.dealId === id);
-       const today = new Date().toISOString().split('T')[0];
-       let newPaymentId = crypto.randomUUID();
+    const today = new Date().toISOString().split('T')[0];
+    const existingPayment = get().payments.find(p => p.dealId === id);
 
-       const paymentStatus = stage === 'Paid' ? 'Paid' : 'Pending';
-       const rcvDate = stage === 'Paid' ? today : null;
-
+    // LOGIC: If PAID -> Generate/Update Payment and Revenue
+    if (stage === 'Paid') {
+       let paymentId = existingPayment?.id || crypto.randomUUID();
+       
        if (existingPayment) {
-          newPaymentId = existingPayment.id;
           set(state => ({
-            payments: state.payments.map(p => p.id === existingPayment.id ? { ...p, status: paymentStatus, receivedDate: rcvDate } : p)
+            payments: state.payments.map(p => p.id === paymentId ? { ...p, status: 'Paid', receivedDate: today } : p)
           }));
-          await supabase.from('payments').update({ status: paymentStatus, received_date: rcvDate }).eq('id', newPaymentId);
+          await supabase.from('payments').update({ status: 'Paid', received_date: today }).eq('id', paymentId);
        } else {
-          const newPayment = {
-            id: newPaymentId,
+          const newPaymentRequest = {
+            id: paymentId,
             deal_id: dealThatMoved.id,
             amount: dealThatMoved.value,
-            status: paymentStatus,
+            status: 'Paid',
             due_date: dealThatMoved.deadline,
-            received_date: rcvDate
+            received_date: today
           };
-          
-          set((state) => ({
+          set(state => ({
             payments: [{
-              id: newPaymentId,
-              dealId: dealThatMoved.id,
-              dealName: dealThatMoved.deliverable,
-              brand: dealThatMoved.brand,
-              platform: dealThatMoved.platform,
-              amount: dealThatMoved.value,
-              status: paymentStatus,
-              dueDate: dealThatMoved.deadline,
-              receivedDate: rcvDate
+                id: paymentId, dealId: dealThatMoved.id, dealName: dealThatMoved.deliverable,
+                brand: dealThatMoved.brand, platform: dealThatMoved.platform,
+                amount: dealThatMoved.value, status: 'Paid', dueDate: dealThatMoved.deadline, receivedDate: today
             }, ...state.payments]
           }));
-
-          await supabase.from('payments').insert([newPayment]);
+          await supabase.from('payments').insert([newPaymentRequest]);
        }
 
-       if (newPaymentId && stage === 'Paid') {
-         const alreadyHasRevenue = get().revenue.some(r => r.payment_id === newPaymentId);
-         if (!alreadyHasRevenue) {
-           const revId = crypto.randomUUID();
-           const newRev = {
-             id: revId,
-             source: 'deal',
-             payment_id: newPaymentId,
-             platform: dealThatMoved.platform,
-             type: 'Sponsorship',
-             amount: dealThatMoved.value,
-             date: today,
-             notes: `Auto-generated from Deal: ${dealThatMoved.brand}`
-           };
-
-           set(state => ({
-             revenue: [{
-               id: revId,
-               date: today,
-               platform: dealThatMoved.platform,
-               type: 'Sponsorship',
-               amount: dealThatMoved.value,
-               notes: newRev.notes,
-               source: 'deal',
-               payment_id: newPaymentId
-             }, ...state.revenue]
-           }));
-
-           await supabase.from('revenue').insert([newRev]);
-         }
+       // Ensure Revenue exists
+       const alreadyHasRevenue = get().revenue.some(r => r.payment_id === paymentId);
+       if (!alreadyHasRevenue) {
+          const revId = crypto.randomUUID();
+          const newRev = {
+             id: revId, source: 'deal', payment_id: paymentId,
+             platform: dealThatMoved.platform, type: 'Sponsorship',
+             amount: dealThatMoved.value, date: today, notes: `Deal: ${dealThatMoved.brand}`
+          };
+          set(state => ({ revenue: [newRev, ...state.revenue] }));
+          await supabase.from('revenue').insert([newRev]);
+       }
+    } 
+    // LOGIC: If DELIVERED -> Ensure Payment exists (Pending) but REMOVE Revenue
+    else if (stage === 'Delivered') {
+       if (existingPayment) {
+          set(state => ({
+            payments: state.payments.map(p => p.id === existingPayment.id ? { ...p, status: 'Pending', receivedDate: null } : p),
+            revenue: state.revenue.filter(r => r.payment_id !== existingPayment.id)
+          }));
+          await supabase.from('payments').update({ status: 'Pending', received_date: null }).eq('id', existingPayment.id);
+          await supabase.from('revenue').delete().eq('payment_id', existingPayment.id);
+       } else {
+          const pId = crypto.randomUUID();
+          set(state => ({
+            payments: [{
+                id: pId, dealId: dealThatMoved.id, dealName: dealThatMoved.deliverable,
+                brand: dealThatMoved.brand, platform: dealThatMoved.platform,
+                amount: dealThatMoved.value, status: 'Pending', dueDate: dealThatMoved.deadline, receivedDate: null
+            }, ...state.payments]
+          }));
+          await supabase.from('payments').insert([{
+            id: pId, deal_id: dealThatMoved.id, amount: dealThatMoved.value,
+            status: 'Pending', due_date: dealThatMoved.deadline, received_date: null
+          }]);
        }
     }
-
-    const originalDeal = originalDeals.find(d => d.id === id);
-    if (stage !== 'Paid' && stage !== 'Delivered' && originalDeal?.isCompleted) {
-        const existingPayment = get().payments.find(p => p.dealId === id);
-        if (existingPayment) {
-            set(state => ({
-              payments: state.payments.map(p => p.id === existingPayment.id ? { ...p, status: 'Pending', receivedDate: null } : p),
-              revenue: state.revenue.filter(r => r.payment_id !== existingPayment.id)
-            }));
-
-            await supabase.from('payments').update({ status: 'Pending', received_date: null }).eq('id', existingPayment.id);
-            await supabase.from('revenue').delete().eq('payment_id', existingPayment.id);
-        }
+    // LOGIC: Anything else -> Remove Revenue and consider removing Payment
+    else {
+       if (existingPayment) {
+          set(state => ({
+            revenue: state.revenue.filter(r => r.payment_id !== existingPayment.id)
+          }));
+          await supabase.from('revenue').delete().eq('payment_id', existingPayment.id);
+          
+          // If we move far back (To-do/Doing), maybe delete payment? 
+          // For now let's just keep it pending or delete if it's not a serious stage
+          if (stage === 'To-do' || stage === 'Doing') {
+             set(state => ({ payments: state.payments.filter(p => p.id !== existingPayment.id) }));
+             await supabase.from('payments').delete().eq('id', existingPayment.id);
+          } else {
+             set(state => ({ payments: state.payments.map(p => p.id === existingPayment.id ? { ...p, status: 'Pending', receivedDate: null } : p) }));
+             await supabase.from('payments').update({ status: 'Pending', received_date: null }).eq('id', existingPayment.id);
+          }
+       }
     }
   },
 
