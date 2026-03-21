@@ -74,8 +74,14 @@ export const useStore = create<AppState>((set, get) => ({
     if (get().isInitialized) return;
 
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+      console.warn('Auth check failed in store:', userError);
+      return;
+    }
+
+    console.log('Initializing store for user:', user.email);
 
     try {
       const [dealsRes, paymentsRes, revenueRes, brandsRes, tasksRes] = await Promise.all([
