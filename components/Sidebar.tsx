@@ -7,7 +7,7 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   const links = [
-    { name: 'Dashboard', icon: LayoutDashboard, href: '/' },
+    { name: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
     { name: 'Deals', icon: Layers, href: '/deals' },
     { name: 'Revenue', icon: IndianRupee, href: '/revenue' },
     { name: 'Payments', icon: CreditCard, href: '/payments' },

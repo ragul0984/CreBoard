@@ -1,8 +1,8 @@
 'use client';
 import { useState } from 'react';
 import { TrendingUp, TrendingDown, DollarSign, Youtube, Instagram, Sparkles, Plus, Filter, Type, X, FileText, CornerDownRight, Trash2 } from 'lucide-react';
-import { RevenueLineChart } from '../../components/revenue/RevenueLineChart';
-import { useStore, RevenueRecord } from '../../src/store';
+import { RevenueLineChart } from '@/components/revenue/RevenueLineChart';
+import { useStore, RevenueRecord } from '@/src/store';
 
 const getPlatformIcon = (platform: string) => {
   const p = platform.toLowerCase();

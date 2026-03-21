@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { Search, Filter, DollarSign, Clock, AlertCircle, CheckCircle2, FileText, Download, ArrowRight, CornerDownRight, X, Plus, Trash2 } from 'lucide-react';
-import { useStore } from '../../src/store';
+import { useStore } from '@/src/store';
 
 const formatDateObj = (dateStr: string) => {
   if (!dateStr) return '';

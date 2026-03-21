@@ -1,6 +1,7 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
-import { MoreHorizontal, Calendar, CheckCircle2, Clock, AlertCircle, Edit2, ArrowRightLeft, CheckCircle, ChevronRight, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Calendar, CheckCircle2, Clock, AlertCircle, Edit2, ArrowRightLeft, CheckCircle, ChevronRight, Trash2, Zap } from 'lucide-react';
+import { useStore } from '../../src/store';
 
 export type Deal = {
   id: string;
@@ -37,6 +38,27 @@ export function DealCard({ deal, onMoveStage, onClick, onDeleteDeal }: DealCardP
   const [showMoveMenu, setShowMoveMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  const payments = useStore(state => state.payments);
+  const deals = useStore(state => state.deals);
+  
+  // Deal Intelligence Engine
+  const avgDeal = deals.length ? deals.reduce((sum, d) => sum + d.value, 0) / deals.length : 0;
+  const brandPayments = payments.filter(p => p.brand === deal.brand);
+  const latePayments = brandPayments.filter(p => p.status === 'Overdue' || (p.receivedDate && p.dueDate && new Date(p.receivedDate) > new Date(p.dueDate))).length;
+
+  let insight = null;
+  if (!deal.isCompleted && deal.stage !== 'Lost') {
+    if (deal.value > avgDeal && latePayments > 0) {
+       insight = { text: "⚠️ High value, delayed payment risk", color: "text-warning-text bg-warning-bg/10 border-warning-text/20" };
+    } else if (deal.value < avgDeal * 0.7 && (deal.platform.toLowerCase().includes('youtube') || deal.deliverable.toLowerCase().includes('video'))) {
+       insight = { text: "🚩 Low value, high effort → avoid", color: "text-danger-text bg-danger-bg/10 border-danger-text/20" };
+    } else if (deal.value > avgDeal * 1.5 && latePayments === 0 && brandPayments.length > 0) {
+       insight = { text: "🔥 Top tier client", color: "text-success-text bg-success-text/10 border-success-text/20" };
+    } else if (deal.value > 0 && deal.value < avgDeal * 0.8) {
+       insight = { text: `Underpriced (Avg: ₹${Math.round(avgDeal).toLocaleString()})`, color: "text-gray-500 bg-gray-500/10 border-border" };
+    }
+  }
+
   // Close menus on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -71,6 +93,11 @@ export function DealCard({ deal, onMoveStage, onClick, onDeleteDeal }: DealCardP
           <div>
             <h4 className="font-bold text-sm tracking-tight leading-tight">{deal.brand}</h4>
             <p className="text-[11px] text-gray-500 leading-tight">{deal.deliverable}</p>
+            {insight && (
+               <div className={`px-1.5 py-0.5 mt-1.5 rounded border text-[9px] font-bold tracking-wide w-fit ${insight.color}`}>
+                  {insight.text}
+               </div>
+            )}
           </div>
         </div>
 

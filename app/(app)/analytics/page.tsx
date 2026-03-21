@@ -1,8 +1,8 @@
 'use client';
 import { useMemo, useState } from 'react';
-import { useStore } from '../../src/store';
+import { useStore } from '@/src/store';
 import { TrendingUp, TrendingDown, DollarSign, Clock, AlertCircle, BarChart3, Youtube, Instagram, Briefcase, Zap, ExternalLink, X, ArrowRight, CornerDownRight } from 'lucide-react';
-import { RevenueLineChart } from '../../components/revenue/RevenueLineChart';
+import { RevenueLineChart } from '@/components/revenue/RevenueLineChart';
 
 const formatDateObj = (dateStr: string) => {
   if (!dateStr) return '';

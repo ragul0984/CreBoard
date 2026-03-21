@@ -1,10 +1,10 @@
 'use client';
 import { useState, useMemo } from 'react';
 import { Search, SortDesc, Plus } from 'lucide-react';
-import { KanbanBoard } from '../../components/deals/KanbanBoard';
-import { Deal } from '../../src/store';
-import { NewDealModal } from '../../components/deals/NewDealModal';
-import { useStore } from '../../src/store';
+import { KanbanBoard } from '@/components/deals/KanbanBoard';
+import { Deal } from '@/src/store';
+import { NewDealModal } from '@/components/deals/NewDealModal';
+import { useStore } from '@/src/store';
 
 export default function DealsPage() {
   const deals = useStore(state => state.deals);

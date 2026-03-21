@@ -1,174 +1,178 @@
 'use client';
-import { IndianRupee, Layers, Clock, AlertCircle } from 'lucide-react';
-import { MonthlyRevenueChart, PlatformDonutChart } from '../components/Charts';
-import { useStore } from '../src/store';
+import Link from 'next/link';
+import { ArrowRight, BarChart3, Briefcase, DollarSign, Zap, Star, ChevronRight, Sparkles, TrendingUp, Users, Calendar, Shield } from 'lucide-react';
+import { useState } from 'react';
 
-export default function Dashboard() {
-  const revenue = useStore(state => state.revenue);
-  const deals = useStore(state => state.deals);
-  const payments = useStore(state => state.payments);
+const NAV_LINKS = [
+  { label: 'Features', href: '#features' },
+  { label: 'Workflow', href: '#how-it-works' },
+  { label: 'Testimonials', href: '#testimonials' },
+];
 
-  const currentYear = new Date().getFullYear();
+const FEATURES = [
+  {
+    icon: Briefcase,
+    title: 'Brand Deal Management',
+    description: 'A visual control center for every partnership. Track leads, deliverables, and payment status in one matte-finished board.',
+  },
+  {
+    icon: DollarSign,
+    title: 'Revenue Intelligence',
+    description: 'Deep analytics into your income streams. Identify underpricing and discover your most profitable platforms instantly.',
+  },
+  {
+    icon: BarChart3,
+    title: 'Automated Tracking',
+    description: 'Real-time monitoring of invoice health. Get alerted the second a payment becomes overdue without lifting a finger.',
+  },
+  {
+    icon: Users,
+    title: 'Brand CRM',
+    description: 'Build a private database of every brand you work with. Monitor their payment reliability and historical deal values.',
+  },
+  {
+    icon: Zap,
+    title: 'Smart Alerts',
+    description: 'Proactive dashboard notifications that surface risks before they hit your bank account.',
+  },
+  {
+    icon: Calendar,
+    title: 'Strategic Planning',
+    description: 'An integrated content calendar that syncs with your deal deadlines for a unified execution roadmap.',
+  },
+];
 
-  // Compute Stats
-  const totalCollected = revenue.reduce((sum, r) => sum + r.amount, 0);
-  const pendingPay = payments.filter(p => p.status === 'Pending').reduce((sum, p) => sum + p.amount, 0);
-  const activeDealsCount = deals.filter(d => d.stage !== 'Lost' && !d.isCompleted).length;
-  const totalDealsCount = deals.length;
-  const overdueCount = payments.filter(p => p.status === 'Overdue').length;
-
-  // Monthly Chart Compute
-  const monthlyMap: Record<string, number> = {};
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  months.forEach(m => monthlyMap[m] = 0);
-
-  let thisYearCollected = 0;
-  revenue.forEach(r => {
-     if (r.date.startsWith(currentYear.toString())) {
-       thisYearCollected += r.amount;
-       const split = r.date.split('-'); 
-       if (split.length >= 2) {
-         const mIdx = parseInt(split[1], 10) - 1;
-         if (!isNaN(mIdx) && mIdx >= 0 && mIdx < 12) {
-           monthlyMap[months[mIdx]] += r.amount;
-         }
-       }
-     }
-  });
-
-  const barData = months.map(name => ({ name, value: monthlyMap[name] }));
-
-  // YoY calculation string
-  const yOy = 'Tracking Live';
-
-  // Platform Donut Compute
-  const platformMap: Record<string, number> = {};
-  revenue.forEach(r => platformMap[r.platform] = (platformMap[r.platform] || 0) + r.amount);
-  const colors = ['#8b5cf6', '#10b981', '#f59e0b', '#3b82f6', '#ec4899'];
-  const platformData = Object.keys(platformMap).map((p, i) => ({
-    id: i, name: p, revenue: platformMap[p], color: colors[i % colors.length]
-  })).sort((a,b) => b.revenue - a.revenue);
-
-  const recentDeals = [...deals]
-     .filter(d => !d.isCompleted && d.stage !== 'Lost')
-     .sort((a,b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())
-     .slice(0, 5);
-
+export default function LandingPage() {
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
-      <div className="mb-4">
-        <h1 className="text-xl font-bold mb-1">Dashboard</h1>
-        <p className="text-gray-500 text-sm dark:text-gray-400">Welcome back! Here's your business overview.</p>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-card border border-border p-5 rounded-2xl flex flex-col relative overflow-hidden">
-          <div className="flex justify-between items-start mb-4">
-            <span className="text-xs font-semibold tracking-wider text-gray-500">TOTAL REVENUE (ALL TIME)</span>
-            <div className="p-2 bg-success-bg text-success-text rounded-xl">
-              <IndianRupee size={18} />
-            </div>
+    <div className="min-h-screen bg-[#050505] text-[#f5f5f5] selection:bg-white selection:text-black">
+      
+      {/* Navbar */}
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#1a1a1a] bg-[#050505]/70 backdrop-blur-md">
+        <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded bg-[#f5f5f5] text-black flex items-center justify-center font-black text-sm">C</div>
+            <span className="text-lg font-bold tracking-tight">CreBoard</span>
           </div>
-          <div className="text-3xl font-bold text-success-text tracking-tight mb-1">₹{totalCollected.toLocaleString()}</div>
-          <div className="text-xs text-gray-500 font-medium">₹{thisYearCollected.toLocaleString()} this year</div>
-        </div>
-
-        <div className="bg-card border border-border p-5 rounded-2xl flex flex-col relative overflow-hidden">
-          <div className="flex justify-between items-start mb-4">
-            <span className="text-xs font-semibold tracking-wider text-gray-500">ACTIVE DEALS</span>
-            <div className="p-2 bg-primary/20 text-primary rounded-xl">
-              <Layers size={18} />
-            </div>
+          <div className="hidden md:flex items-center gap-10">
+            {NAV_LINKS.map(link => (
+              <a key={link.label} href={link.href} className="text-[13px] text-[#888] hover:text-[#f5f5f5] transition-colors font-medium tracking-wide lowercase">{link.label}</a>
+            ))}
           </div>
-          <div className="text-3xl font-bold text-primary tracking-tight mb-1">{activeDealsCount}</div>
-          <div className="text-xs text-gray-500 font-medium">{totalDealsCount} total lifetime</div>
+          <Link href="/dashboard" className="px-6 py-2.5 bg-[#f5f5f5] text-black text-[13px] font-bold rounded-full hover:bg-[#e0e0e0] transition-all flex items-center gap-2 uppercase tracking-widest">
+            Dashboard <ArrowRight size={14} />
+          </Link>
         </div>
+      </nav>
 
-        <div className="bg-card border border-border p-5 rounded-2xl flex flex-col relative overflow-hidden">
-          <div className="flex justify-between items-start mb-4">
-            <span className="text-xs font-semibold tracking-wider text-gray-500">PENDING PAY</span>
-            <div className="p-2 bg-warning-bg bg-opacity-40 text-warning-text rounded-xl">
-              <Clock size={18} />
-            </div>
+      {/* Hero Section */}
+      <section className="pt-48 pb-32 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#1a1a1a] bg-[#0a0a0a] text-[11px] font-bold text-[#666] mb-10 tracking-[0.2em] uppercase">
+             Version 1.0 — Out Now
           </div>
-          <div className="text-3xl font-bold text-warning-text tracking-tight mb-1">₹{pendingPay.toLocaleString()}</div>
-          <div className="text-xs text-gray-500 font-medium">Awaiting collection</div>
-        </div>
 
-        <div className="bg-card border border-border p-5 rounded-2xl flex flex-col relative overflow-hidden">
-          <div className="flex justify-between items-start mb-4">
-            <span className="text-xs font-semibold tracking-wider text-gray-500">OVERDUE</span>
-            <div className="p-2 bg-danger-bg bg-opacity-40 text-danger-text rounded-xl">
-              <AlertCircle size={18} />
-            </div>
+          <h1 className="text-6xl md:text-8xl font-bold tracking-tight leading-[0.95] mb-8 text-white">
+            Own the business<br />behind your content.
+          </h1>
+
+          <p className="text-lg md:text-xl text-[#888] max-w-2xl mx-auto mb-12 font-medium leading-relaxed">
+            The operating system for modern creators. Track deals, manage payments, and monitor revenue in a workspace designed for extreme productivity.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+            <Link href="/dashboard" className="px-10 py-4 bg-[#f5f5f5] text-black font-bold rounded-xl hover:bg-white transition-all text-sm uppercase tracking-widest flex items-center gap-2">
+              Start Building <ArrowRight size={16} />
+            </Link>
+            <a href="#features" className="px-10 py-4 border border-[#1a1a1a] text-[#f5f5f5] font-bold rounded-xl hover:bg-[#111] transition-all text-sm uppercase tracking-widest">
+              Explore Tools
+            </a>
           </div>
-          <div className="text-3xl font-bold text-danger-text tracking-tight mb-1">{overdueCount}</div>
-          <div className="text-xs text-gray-500 font-medium">Require attention</div>
         </div>
-      </div>
+      </section>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 bg-card border border-border p-5 rounded-2xl h-[340px] flex flex-col">
-          <div className="flex justify-between items-start mb-2">
+      {/* Features Grid */}
+      <section id="features" className="py-32 px-6 border-t border-[#1a1a1a]">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-l border-t border-[#1a1a1a]">
+            {FEATURES.map((feature, i) => {
+              const Icon = feature.icon;
+              return (
+                <div
+                  key={i}
+                  className="p-10 border-r border-b border-[#1a1a1a] hover:bg-[#0a0a0a] transition-colors"
+                >
+                  <div className="w-10 h-10 flex items-center justify-center mb-8 text-white">
+                    <Icon size={32} strokeWidth={1.5} />
+                  </div>
+                  <h3 className="text-xl font-bold mb-4 text-white uppercase tracking-tight">{feature.title}</h3>
+                  <p className="text-[#666] leading-relaxed text-[15px] font-medium">{feature.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Product Highlight */}
+      <section className="py-32 px-6 bg-white text-black">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div>
-              <h3 className="text-gray-500 dark:text-gray-400 font-medium text-xs mb-1">Monthly Revenue ({currentYear})</h3>
-              <p className="text-2xl font-bold">₹{thisYearCollected.toLocaleString()}</p>
+              <h2 className="text-4xl md:text-6xl font-bold leading-tight tracking-tight mb-8">
+                Professional tools for professional results.
+              </h2>
+              <p className="text-lg text-black/60 font-medium leading-relaxed mb-10">
+                Spreadsheets aren't enough when your business scales. CreBoard gives you a purpose-built workspace that handles the heavy lifting of CRM and revenue tracking so you can focus on creation.
+              </p>
+              <ul className="space-y-4">
+                {['Real-time Payment Tracking', 'Dynamic Brand Intelligence', 'Integrated Revenue Analytics'].map(item => (
+                  <li key={item} className="flex items-center gap-4 font-bold text-sm tracking-widest uppercase">
+                    <div className="w-5 h-5 bg-black text-white flex items-center justify-center rounded-sm"><ArrowRight size={12} /></div>
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </div>
-            <div className="px-3 py-1 rounded-full bg-success-bg/30 text-success-text border border-success-text/20 text-xs font-bold flex items-center gap-1">
-              {yOy}
+            <div className="aspect-square bg-black rounded-3xl p-1 shadow-2xl overflow-hidden grayscale hover:grayscale-0 transition-all duration-700">
+               <div className="w-full h-full bg-[#111] border border-white/5 rounded-2xl flex items-center justify-center text-white/10 font-black text-8xl uppercase tracking-tighter italic">
+                 Matte OS
+               </div>
             </div>
-          </div>
-          <div className="flex-1 mt-4">
-            <MonthlyRevenueChart data={barData} />
           </div>
         </div>
-        <div className="bg-card border border-border p-5 rounded-2xl h-[340px] flex flex-col relative">
-          <h3 className="text-gray-500 dark:text-gray-400 font-medium text-xs mb-4">Lifetime Platform Revenue</h3>
-          <div className="flex-1 mt-0">
-            <PlatformDonutChart data={platformData} />
-          </div>
-        </div>
-      </div>
+      </section>
 
-      <div className="bg-card border border-border rounded-2xl overflow-hidden mt-6">
-        <div className="p-5 border-b border-border">
-          <h2 className="text-sm font-bold tracking-wide">Ongoing Deals Timeline</h2>
+      {/* CTA section */}
+      <section className="py-48 px-6 text-center">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-10">Ready to scale?</h2>
+          <Link href="/dashboard" className="px-12 py-5 bg-[#f5f5f5] text-black font-black rounded-full hover:bg-white transition-all text-lg uppercase tracking-widest shadow-2xl">
+            Get Instant Access
+          </Link>
+          <div className="mt-12 text-[#666] text-xs font-bold uppercase tracking-[0.3em]">
+            No Subscription — Forever Free for Solo Creators
+          </div>
         </div>
-        <div className="p-1 overflow-x-auto">
-             <table className="w-full text-left text-sm whitespace-nowrap">
-                <thead>
-                    <tr className="text-gray-500 text-xs font-semibold tracking-wider">
-                        <th className="px-4 py-4 uppercase">Brand</th>
-                        <th className="px-4 py-4 uppercase">Platform</th>
-                        <th className="px-4 py-4 uppercase">Value</th>
-                        <th className="px-4 py-4 uppercase">Status</th>
-                        <th className="px-4 py-4 uppercase">Deadline</th>
-                    </tr>
-                </thead>
-                <tbody className="text-gray-700 dark:text-gray-300 font-medium text-sm">
-                  {recentDeals.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="py-6 text-center text-gray-400 text-xs tracking-widest uppercase">No Active Deals Found</td>
-                    </tr>
-                  ) : (
-                    recentDeals.map(d => (
-                    <tr key={d.id} className="hover:bg-black/5 dark:hover:bg-white/[0.02] transition-colors rounded-lg group">
-                        <td className="px-4 py-3 text-black dark:text-white group-hover:bg-black/5 dark:group-hover:bg-white/[0.02] rounded-l-lg">{d.brand}</td>
-                        <td className="px-4 py-3 group-hover:bg-black/5 dark:group-hover:bg-white/[0.02]">
-                          <span className="px-2 py-0.5 rounded-md bg-black/5 dark:bg-[#1b1e27] text-gray-500 dark:text-gray-400 text-xs font-medium border border-border">{d.platform}</span>
-                        </td>
-                        <td className="px-4 py-3 text-success-text group-hover:bg-black/5 dark:group-hover:bg-white/[0.02]">₹{d.value.toLocaleString()}</td>
-                        <td className="px-4 py-3 group-hover:bg-black/5 dark:group-hover:bg-white/[0.02]">
-                          <span className={`${d.stage === 'Delivered' ? 'text-primary' : d.stage === 'Paid' ? 'text-success-text' : 'text-warning-text'} font-bold`}>{d.stage}</span>
-                        </td>
-                        <td className="px-4 py-3 text-gray-500 group-hover:bg-black/5 dark:group-hover:bg-white/[0.02] rounded-r-lg">{d.deadline}</td>
-                    </tr>
-                    ))
-                  )}
-                </tbody>
-             </table>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-20 px-6 border-t border-[#1a1a1a]">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10">
+          <div className="flex items-center gap-3">
+             <div className="w-6 h-6 rounded bg-white text-black flex items-center justify-center font-black text-[10px]">C</div>
+             <span className="font-bold text-sm tracking-widest uppercase">CreBoard</span>
+          </div>
+          <div className="flex items-center gap-12">
+            {NAV_LINKS.map(link => (
+              <a key={link.label} href={link.href} className="text-xs text-[#444] hover:text-[#f5f5f5] transition-colors font-bold uppercase tracking-widest">{link.label}</a>
+            ))}
+          </div>
+          <div className="text-[10px] text-[#444] font-bold uppercase tracking-[0.2em]">
+            © {new Date().getFullYear()} / Design by CreBoard
+          </div>
         </div>
-      </div>
+      </footer>
+
     </div>
   );
 }

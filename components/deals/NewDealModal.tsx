@@ -1,7 +1,8 @@
 'use client';
 import { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, AlertTriangle } from 'lucide-react';
 import { Deal } from './DealCard';
+import { useStore } from '../../src/store';
 
 export function NewDealModal({ onClose, onSave }: { onClose: () => void, onSave: (deal: Deal) => void }) {
    const [brand, setBrand] = useState('');
@@ -10,6 +11,10 @@ export function NewDealModal({ onClose, onSave }: { onClose: () => void, onSave:
    const [value, setValue] = useState<number | ''>('');
    const [deadline, setDeadline] = useState(new Date().toISOString().split('T')[0]);
    const [deliverable, setDeliverable] = useState('');
+
+   const deals = useStore(state => state.deals);
+   const avgDeal = deals.length ? deals.reduce((sum, d) => sum + d.value, 0) / deals.length : 0;
+   const isUnderpriced = typeof value === 'number' && value > 0 && avgDeal > 0 && value < avgDeal * 0.8;
 
    const STAGES = ['Lead', 'Negotiating', 'Contract Sent', 'Active', 'Delivered', 'Paid', 'Lost'];
 
@@ -54,7 +59,13 @@ export function NewDealModal({ onClose, onSave }: { onClose: () => void, onSave:
               <div className="grid grid-cols-2 gap-4">
                  <div className="space-y-1.5">
                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Value (₹)</label>
-                   <input required type="number" min="0" value={value} onChange={e => setValue(Number(e.target.value))} className="w-full px-3 py-2 rounded-lg bg-black/5 dark:bg-white/5 border border-border focus:outline-none focus:border-primary text-sm font-medium" placeholder="0" />
+                   <input required type="number" min="0" value={value} onChange={e => setValue(Number(e.target.value))} className={`w-full px-3 py-2 rounded-lg bg-black/5 dark:bg-white/5 border focus:outline-none text-sm font-medium ${isUnderpriced ? 'border-warning-text focus:border-warning-text' : 'border-border focus:border-primary'}`} placeholder="0" />
+                   {isUnderpriced && (
+                     <div className="mt-1.5 flex items-start gap-1.5 text-warning-text bg-warning-bg/10 border border-warning-text/20 rounded-lg px-2.5 py-1.5">
+                       <AlertTriangle size={13} className="shrink-0 mt-0.5" strokeWidth={2.5}/>
+                       <p className="text-[11px] font-bold leading-tight">Your avg deal = ₹{Math.round(avgDeal).toLocaleString()}. This deal is ₹{typeof value === 'number' ? value.toLocaleString() : 0} → <span className="underline">underpriced</span></p>
+                     </div>
+                   )}
                  </div>
                  <div className="space-y-1.5">
                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Deadline</label>

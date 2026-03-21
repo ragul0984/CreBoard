@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useStore, BrandProfile } from '../../src/store';
+import { useStore, BrandProfile } from '@/src/store';
 import { Star, Briefcase, DollarSign, Clock, AlertCircle, CheckCircle2, Users, Search, MessageSquare, X, User, Plus, Trash2, Edit2 } from 'lucide-react';
 
 const formatDateObj = (dateStr: string) => {

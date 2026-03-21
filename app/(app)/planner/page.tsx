@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { Calendar as CalendarIcon, Clock, CheckCircle2, AlertCircle, Plus, Youtube, Instagram, Briefcase, ChevronLeft, ChevronRight, FileText, Type, LayoutTemplate, X } from 'lucide-react';
-import { useStore, ContentTask } from '../../src/store';
+import { useStore, ContentTask } from '@/src/store';
 
 const getPlatformIcon = (platform: string) => {
    const p = platform.toLowerCase();
