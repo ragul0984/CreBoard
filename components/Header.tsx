@@ -1,12 +1,12 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { Sun, Moon, LogOut, User } from "lucide-react";
+import { Sun, Moon, LogOut, User, Menu } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createClient } from "@/src/utils/supabase/client";
 import { useRouter } from "next/navigation";
 
-export default function Header() {
+export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [user, setUser] = useState<any>(null);
@@ -29,9 +29,18 @@ export default function Header() {
   };
 
   return (
-    <header className="h-16 border-b border-border bg-card/50 backdrop-blur sticky top-0 z-10 flex items-center justify-between px-6">
-      <div className="font-medium text-sm text-gray-500">
-        Dashboard Overview
+    <header className="h-16 border-b border-border bg-card/50 backdrop-blur sticky top-0 z-40 flex items-center justify-between px-4 md:px-6">
+      <div className="flex items-center gap-3">
+        <button 
+          onClick={onMenuClick}
+          className="p-2 -ml-2 rounded-lg hover:bg-foreground/5 md:hidden text-foreground-muted"
+          aria-label="Open Menu"
+        >
+          <Menu size={20} />
+        </button>
+        <div className="font-medium text-sm text-foreground-muted hidden sm:block">
+          Dashboard Overview
+        </div>
       </div>
       
       <div className="flex items-center gap-4">
@@ -40,9 +49,9 @@ export default function Header() {
             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
               <User size={16} />
             </div>
-            <div className="hidden sm:block text-right">
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Signed in as</p>
-              <p className="text-xs font-bold truncate max-w-[150px]">{user.email}</p>
+            <div className="hidden lg:block text-right">
+              <p className="text-[10px] font-bold text-foreground-subtle uppercase tracking-widest leading-none mb-1">Signed in as</p>
+              <p className="text-xs font-bold truncate max-w-[150px] text-foreground">{user.email}</p>
             </div>
             <button 
               onClick={handleLogout}

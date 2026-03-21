@@ -1,9 +1,8 @@
-'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Layers, IndianRupee, CreditCard, BarChart3, Calendar, Users } from 'lucide-react';
+import { LayoutDashboard, Layers, IndianRupee, CreditCard, BarChart3, Calendar, Users, X } from 'lucide-react';
 
-export default function Sidebar() {
+export default function Sidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
 
   const links = [
@@ -17,10 +16,15 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-[220px] border-r border-border bg-card h-screen flex flex-col py-6 sticky top-0 shrink-0">
-      <div className="px-5 mb-8 flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-sm">C</div>
-        <span className="text-lg font-semibold tracking-tight">CreBoard</span>
+    <aside className="w-full md:w-[220px] border-r border-border bg-card h-full md:h-screen flex flex-col py-6 sticky top-0 shrink-0">
+      <div className="px-5 mb-8 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white font-bold text-sm">C</div>
+          <span className="text-lg font-semibold tracking-tight text-foreground">CreBoard</span>
+        </div>
+        <button onClick={onClose} className="md:hidden p-2 -mr-2 text-foreground-muted hover:bg-foreground/5 rounded-lg">
+          <X size={20} />
+        </button>
       </div>
       <nav className="flex-1 px-3 space-y-1">
         {links.map((link) => {
@@ -30,10 +34,11 @@ export default function Sidebar() {
             <Link
               key={link.name}
               href={link.href}
+              onClick={onClose}
               className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all text-sm ${
                 isActive
                   ? 'bg-primary/10 text-primary font-medium'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-gray-200 hover:bg-black/5 dark:hover:bg-white/5'
+                  : 'text-foreground-muted hover:text-foreground hover:bg-foreground/5'
               }`}
             >
               <Icon size={16} strokeWidth={isActive ? 2.5 : 2} />

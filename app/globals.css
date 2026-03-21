@@ -3,6 +3,8 @@
 @theme inline {
   --color-background: var(--bg);
   --color-foreground: var(--fg);
+  --color-foreground-muted: var(--fg-muted);
+  --color-foreground-subtle: var(--fg-subtle);
   --color-card: var(--card);
   --color-border: var(--border-color);
   
@@ -20,10 +22,12 @@
 }
 
 :root {
-  --bg: #f8fafc;
-  --fg: #0f172a;
+  --bg: #ffffff;
+  --fg: #020617;
+  --fg-muted: #475569;
+  --fg-subtle: #94a3b8;
   --card: #ffffff;
-  --border-color: #e2e8f0;
+  --border-color: #f1f5f9;
   
   --success-bg: #d1fae5;
   --success-text: #059669;
@@ -36,10 +40,12 @@
 }
 
 .dark {
-  --bg: #0b0c10;
+  --bg: #020617;
   --fg: #f8fafc;
-  --card: #13151b;
-  --border-color: #1f232b;
+  --fg-muted: #94a3b8;
+  --fg-subtle: #475569;
+  --card: #0f172a;
+  --border-color: #1e293b;
   
   --success-bg: #064e3b;
   --success-text: #34d399;
