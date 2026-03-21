@@ -1,10 +1,12 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { Sun, Moon, LogOut, User, Menu } from "lucide-react";
+import { Sun, Moon, LogOut, User, Menu, Bell } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createClient } from "@/src/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useStore } from "@/src/store";
 
 export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
   const { theme, setTheme } = useTheme();
@@ -12,6 +14,9 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
   const [user, setUser] = useState<any>(null);
   const supabase = createClient();
   const router = useRouter();
+  
+  const payments = useStore(state => state.payments);
+  const overdueCount = payments.filter(p => p.status === 'Overdue').length;
 
   useEffect(() => {
     setMounted(true);
@@ -46,16 +51,33 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
       <div className="flex items-center gap-4">
         {user && (
           <div className="flex items-center gap-3 pr-4 border-r border-border">
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-              <User size={16} />
-            </div>
-            <div className="hidden lg:block text-right">
-              <p className="text-[10px] font-bold text-foreground-subtle uppercase tracking-widest leading-none mb-1">Signed in as</p>
-              <p className="text-xs font-bold truncate max-w-[150px] text-foreground">{user.email}</p>
-            </div>
+            <Link 
+              href="/alerts"
+              className="p-2 rounded-lg text-foreground-muted hover:bg-foreground/5 relative mr-1"
+              title="Alerts"
+            >
+              <Bell size={18} />
+              {overdueCount > 0 && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-card" />
+              )}
+            </Link>
+
+            <Link 
+              href="/profile"
+              className="flex items-center gap-3 hover:bg-foreground/5 p-1 rounded-xl transition-colors group"
+            >
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary/20">
+                <User size={16} />
+              </div>
+              <div className="hidden lg:block text-right">
+                <p className="text-[10px] font-bold text-foreground-subtle uppercase tracking-widest leading-none mb-1">Account</p>
+                <p className="text-xs font-bold truncate max-w-[150px] text-foreground">{user.email}</p>
+              </div>
+            </Link>
+
             <button 
               onClick={handleLogout}
-              className="ml-2 p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"
+              className="ml-2 p-2 rounded-lg text-foreground-subtle hover:text-red-500 hover:bg-red-500/10 transition-colors"
               title="Logout"
             >
               <LogOut size={18} />

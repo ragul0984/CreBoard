@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Layers, IndianRupee, CreditCard, BarChart3, Calendar, Users, X } from 'lucide-react';
+import { LayoutDashboard, Layers, IndianRupee, CreditCard, BarChart3, Calendar, Users, X, AlertCircle, User } from 'lucide-react';
 
 export default function Sidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
@@ -15,6 +15,8 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
     { name: 'Analytics', icon: BarChart3, href: '/analytics' },
     { name: 'Planner', icon: Calendar, href: '/planner' },
     { name: 'Brand CRM', icon: Users, href: '/crm' },
+    { name: 'Alerts', icon: AlertCircle, href: '/alerts' },
+    { name: 'Profile', icon: User, href: '/profile' },
   ];
 
   return (
