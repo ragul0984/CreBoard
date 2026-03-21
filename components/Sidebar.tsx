@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, Layers, IndianRupee, CreditCard, BarChart3, Calendar, Users, X } from 'lucide-react';
