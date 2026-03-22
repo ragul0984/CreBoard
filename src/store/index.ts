@@ -43,8 +43,10 @@ interface AppState {
   contentTasks: ContentTask[];
   brands: BrandProfile[];
   userId: string | null;
+  userEmail: string | null;
 
   initializeStore: () => Promise<void>;
+  clearStore: () => void;
 
   addBrand: (brand: BrandProfile) => void;
   updateBrand: (id: string, updates: Partial<BrandProfile>) => void;
@@ -71,20 +73,21 @@ export const useStore = create<AppState>((set, get) => ({
   contracts: [],
   contentTasks: [],
   userId: null,
+  userEmail: null,
 
   initializeStore: async () => {
     console.log('📦 Calling initializeStore...');
-    if (get().isInitialized) {
-      console.log('✅ Store already initialized, skipping.');
-      return;
-    }
-
     const supabase = createClient();
     console.log('📡 Fetching user session...');
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     
     if (userError || !user) {
       console.warn('❌ Auth check failed in store:', userError || 'No user found');
+      return;
+    }
+
+    if (get().isInitialized && get().userId === user.id) {
+      console.log('✅ Store already initialized for current user, skipping.');
       return;
     }
 
@@ -163,12 +166,28 @@ export const useStore = create<AppState>((set, get) => ({
         brands: fetchedBrands,
         contentTasks: fetchedTasks,
         userId: user.id,
+        userEmail: user.email || null,
         isInitialized: true
       });
       console.log('Store initialized with data from Supabase');
     } catch (error) {
       console.error('Failed to fetch from Supabase:', error);
     }
+  },
+
+  clearStore: () => {
+    set({
+      isInitialized: false,
+      deals: [],
+      payments: [],
+      revenue: [],
+      brands: [],
+      contracts: [],
+      contentTasks: [],
+      userId: null,
+      userEmail: null
+    });
+    console.log('🧹 Store cleared');
   },
   
   addBrand: async (brand) => {

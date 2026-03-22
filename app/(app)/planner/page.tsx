@@ -59,7 +59,7 @@ export default function PlannerPage() {
        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setSelectedCalendarItem(null)}>
           <div className="bg-card w-full max-w-sm rounded-2xl shadow-2xl border border-border overflow-hidden" onClick={e => e.stopPropagation()}>
              <div className="p-4 border-b border-border flex justify-between items-center bg-black/10 dark:bg-white/5">
-                <h2 className="font-bold text-[10px] uppercase tracking-widest text-gray-500">
+                <h2 className="font-bold text-[10px] uppercase tracking-widest text-foreground-muted">
                    {selectedCalendarItem.type === 'content' ? 'Content Execution Task' : selectedCalendarItem.type === 'deal' ? 'CRM Deadline Linked' : 'Action Required Alert'}
                 </h2>
                 <button onClick={() => setSelectedCalendarItem(null)} className="p-1 rounded-lg text-gray-500 hover:text-black dark:hover:text-white bg-black/5 dark:bg-white/5 transition-colors"><X size={16} strokeWidth={3}/></button>
@@ -71,7 +71,7 @@ export default function PlannerPage() {
                       <h3 className="font-black text-xl text-gray-800 dark:text-gray-200 leading-tight">{selectedCalendarItem.data.title}</h3>
                       <div className="flex justify-center items-center gap-2">
                          <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded border border-primary/20">{selectedCalendarItem.data.platform}</span>
-                         <span className="text-xs font-bold text-gray-600 dark:text-gray-300 bg-black/5 dark:bg-white/5 px-2 py-1 rounded border border-border">{selectedCalendarItem.data.type} Format</span>
+                         <span className="text-xs font-bold text-foreground-muted bg-black/5 dark:bg-white/5 px-2 py-1 rounded border border-border">{selectedCalendarItem.data.type} Format</span>
                       </div>
                       <p className="text-sm font-medium text-gray-500 mt-2">Target Date: <span className="text-gray-800 dark:text-gray-200 font-bold">{selectedCalendarItem.data.dueDate}</span></p>
                       <button onClick={() => { updateContentTaskStatus(selectedCalendarItem.data.id, 'Posted'); setSelectedCalendarItem(null); }} className="w-full mt-2 py-2 rounded-xl bg-primary text-white font-bold text-sm shadow-sm hover:bg-primary-hover transition-colors">Mark as Posted!</button>
@@ -263,7 +263,7 @@ export default function PlannerPage() {
                                     <div className="text-[10px] font-bold text-gray-500 flex items-center gap-1.5 uppercase mt-0.5">{getPlatformIcon(t.platform)} {t.type}</div>
                                  </td>
                                  <td className="px-4 py-3.5">
-                                    <span className="text-xs font-semibold text-gray-600 dark:text-gray-400 bg-black/5 dark:bg-white/5 px-2.5 py-1 rounded-md border border-border/50 shadow-inner">{t.dueDate}</span>
+                                    <span className="text-xs font-semibold text-foreground-muted bg-black/5 dark:bg-white/5 px-2.5 py-1 rounded-md border border-border/50 shadow-inner">{t.dueDate}</span>
                                  </td>
                                  <td className="px-4 py-3.5" onClick={e => e.stopPropagation()}>
                                     <select 

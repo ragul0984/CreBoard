@@ -7,7 +7,7 @@ import { DndContext, DragEndEvent, closestCorners, useDraggable, useDroppable, M
 const STAGES = ['Lead', 'Negotiating', 'Contract Sent', 'Active', 'Delivered', 'Paid', 'Lost'];
 
 const STAGE_COLORS: Record<string, string> = {
-  'Lead':          'border-gray-300 dark:border-gray-700',
+  'Lead':          'border-border',
   'Negotiating':   'border-blue-400/50',
   'Contract Sent': 'border-purple-400/50',
   'Active':        'border-warning-text/50',
@@ -17,7 +17,7 @@ const STAGE_COLORS: Record<string, string> = {
 };
 
 const STAGE_HEADER_COLORS: Record<string, string> = {
-  'Lead':          'text-gray-500',
+  'Lead':          'text-foreground-muted',
   'Negotiating':   'text-blue-400',
   'Contract Sent': 'text-purple-400',
   'Active':        'text-warning-text',
@@ -29,11 +29,11 @@ const STAGE_HEADER_COLORS: Record<string, string> = {
 function DroppableColumn({ stage, stageDeals, onUpdateDealStage, setSelectedDeal, onDeleteDeal }: any) {
   const { setNodeRef, isOver } = useDroppable({ id: stage });
   return (
-    <div className="flex flex-col min-w-0">
+    <div className="flex flex-col min-w-[280px] md:min-w-0">
       <div className="flex items-center justify-between mb-3 px-1">
-        <h3 className={`font-bold text-xs uppercase tracking-widest flex items-center gap-2 ${STAGE_HEADER_COLORS[stage] || 'text-gray-500'}`}>
+        <h3 className={`font-bold text-xs uppercase tracking-widest flex items-center gap-2 ${STAGE_HEADER_COLORS[stage] || 'text-foreground-muted'}`}>
           {stage}
-          <span className="bg-black/5 dark:bg-white/10 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full text-[10px] font-bold normal-case">{stageDeals.length}</span>
+          <span className="bg-foreground/5 text-foreground-muted px-2 py-0.5 rounded-full text-[10px] font-bold normal-case">{stageDeals.length}</span>
         </h3>
       </div>
 
@@ -50,7 +50,7 @@ function DroppableColumn({ stage, stageDeals, onUpdateDealStage, setSelectedDeal
         ))}
 
         {stageDeals.length === 0 && (
-          <div className="flex-1 flex items-center justify-center py-6 text-center text-[10px] text-gray-400 font-bold uppercase tracking-widest border-2 border-dashed border-border/50 rounded-xl opacity-60">
+          <div className="flex-1 flex items-center justify-center py-6 text-center text-[10px] text-foreground-subtle font-bold uppercase tracking-widest border-2 border-dashed border-border rounded-xl opacity-60">
             Drop here
           </div>
         )}
@@ -125,8 +125,7 @@ export function KanbanBoard({ deals, onUpdateDealStage, onDeleteDeal }: KanbanBo
     <>
       <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
         <div
-          className="grid gap-4 pb-4 items-start w-full"
-          style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))' }}
+          className="flex md:grid md:grid-cols-7 gap-4 pb-4 items-start w-full overflow-x-auto md:overflow-x-visible snap-x"
         >
           {STAGES.map(stage => {
             const stageDeals = deals.filter(d => d.stage === stage);

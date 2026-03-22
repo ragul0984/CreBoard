@@ -81,8 +81,8 @@ export default function PaymentsPage() {
             </div>
             <div className="p-6 space-y-4">
               <div className="text-center pb-4 border-b border-border">
-                <div className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Amount</div>
-                <div className="text-4xl font-black text-gray-800 dark:text-gray-200 tracking-tight">₹{detailPayment.amount.toLocaleString()}</div>
+                <div className="text-xs font-bold text-foreground-muted uppercase tracking-widest mb-1">Amount</div>
+                <div className="text-4xl font-black text-foreground tracking-tight">₹{detailPayment.amount.toLocaleString()}</div>
                 <span className={`mt-2 inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
                   detailPayment.status === 'Paid' ? 'bg-success-bg text-success-text' :
                   detailPayment.status === 'Overdue' ? 'bg-danger-text/20 text-danger-text' :
@@ -131,18 +131,18 @@ export default function PaymentsPage() {
           <div className="bg-card border border-border rounded-2xl w-[450px] shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
             <div className="p-6 border-b border-border bg-primary/5">
               <h2 className="text-xl font-bold flex items-center gap-2 text-primary"><DollarSign size={20}/> Log Payment Received</h2>
-              <p className="text-sm text-gray-500 font-medium mt-1">This will automatically generate a Revenue record.</p>
+              <p className="text-sm text-foreground-muted font-medium mt-1">This will automatically generate a Revenue record.</p>
             </div>
             <form onSubmit={handleConfirmReceive} className="p-6 space-y-5">
-              <div className="bg-black/5 dark:bg-white/[0.02] p-4 rounded-xl border border-border">
-                <div className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Invoice Details</div>
-                <div className="font-bold text-gray-800 dark:text-gray-200">{receivingPayment.brand} — {receivingPayment.dealName}</div>
+              <div className="bg-foreground/5 p-4 rounded-xl border border-border">
+                <div className="text-xs font-bold text-foreground-muted uppercase tracking-wider mb-1">Invoice Details</div>
+                <div className="font-bold text-foreground">{receivingPayment.brand} — {receivingPayment.dealName}</div>
                 <div className="text-xl font-bold text-success-text mt-2">₹{receivingPayment.amount.toLocaleString()}</div>
               </div>
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Date Received</label>
                 <input required type="date" value={receivedDate} onChange={e => setReceivedDate(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-border focus:outline-none focus:border-primary text-sm font-medium text-gray-700 dark:text-gray-300"/>
+                  className="w-full px-4 py-2.5 rounded-xl bg-foreground/5 border border-border focus:outline-none focus:border-primary text-sm font-medium text-foreground"/>
               </div>
               <div className="bg-success-bg/30 text-success-text p-3 rounded-xl flex items-start gap-2 text-xs font-medium border border-success-text/20">
                 <CheckCircle2 size={14} className="shrink-0 mt-0.5"/>
@@ -246,8 +246,8 @@ export default function PaymentsPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="bg-card border border-border p-5 rounded-xl flex flex-col">
           <span className="text-[10px] font-bold tracking-widest text-warning-text mb-1 flex items-center gap-1"><Clock size={12}/> TOTAL PENDING</span>
-          <div className="text-3xl font-bold tracking-tight mb-1 text-gray-800 dark:text-gray-200">₹{totalPending.toLocaleString()}</div>
-          <div className="text-xs text-gray-500 font-medium">Awaiting payment</div>
+          <div className="text-3xl font-bold tracking-tight mb-1 text-foreground">₹{totalPending.toLocaleString()}</div>
+          <div className="text-xs text-foreground-muted font-medium">Awaiting payment</div>
         </div>
         <div className="bg-card border border-danger-text/30 p-5 rounded-xl flex flex-col shadow-[0_0_15px_rgba(239,68,68,0.05)]">
           <span className="text-[10px] font-bold tracking-widest text-danger-text mb-1 flex items-center gap-1"><AlertCircle size={12}/> SEVERELY OVERDUE</span>
@@ -294,10 +294,10 @@ export default function PaymentsPage() {
                   className="hover:bg-black/5 dark:hover:bg-white/[0.02] transition-colors border-b border-border/50 group cursor-pointer"
                 >
                   <td className="px-6 py-4">
-                    <div className="font-bold text-black dark:text-white group-hover:text-primary transition-colors">{payment.brand}</div>
-                    <div className="text-xs text-gray-500 flex items-center gap-1 mt-0.5"><CornerDownRight size={10}/> {payment.dealName}</div>
+                    <div className="font-bold text-foreground group-hover:text-primary transition-colors">{payment.brand}</div>
+                    <div className="text-xs text-foreground-muted flex items-center gap-1 mt-0.5"><CornerDownRight size={10}/> {payment.dealName}</div>
                   </td>
-                  <td className="px-6 py-4 font-bold text-base text-gray-800 dark:text-gray-200">₹{payment.amount.toLocaleString()}</td>
+                  <td className="px-6 py-4 font-bold text-base text-foreground">₹{payment.amount.toLocaleString()}</td>
                   <td className="px-6 py-4">
                     <div className={`text-xs font-semibold ${payment.status === 'Overdue' ? 'text-danger-text' : 'text-gray-500'}`}>
                       {payment.status === 'Paid' && payment.receivedDate ? (<>Received<br/>{formatDateObj(payment.receivedDate)}</>) : formatDateObj(payment.dueDate)}

@@ -16,6 +16,7 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
   const router = useRouter();
   
   const payments = useStore(state => state.payments);
+  const clearStore = useStore(state => state.clearStore);
   const overdueCount = payments.filter(p => p.status === 'Overdue').length;
 
   useEffect(() => {
@@ -28,6 +29,7 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
   }, [supabase]);
 
   const handleLogout = async () => {
+    clearStore();
     await supabase.auth.signOut();
     router.push('/login');
     router.refresh();
@@ -88,7 +90,7 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
         {mounted && (
           <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="p-2 rounded-lg bg-black/5 hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10 transition-colors text-gray-600 dark:text-gray-300"
+            className="p-2 rounded-lg bg-foreground/5 hover:bg-foreground/10 transition-colors text-foreground-muted hover:text-foreground"
             aria-label="Toggle Theme"
           >
             {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}

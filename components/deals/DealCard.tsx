@@ -55,7 +55,7 @@ export function DealCard({ deal, onMoveStage, onClick, onDeleteDeal }: DealCardP
     } else if (deal.value > avgDeal * 1.5 && latePayments === 0 && brandPayments.length > 0) {
        insight = { text: "🔥 Top tier client", color: "text-success-text bg-success-text/10 border-success-text/20" };
     } else if (deal.value > 0 && deal.value < avgDeal * 0.8) {
-       insight = { text: `Underpriced (Avg: ₹${Math.round(avgDeal).toLocaleString()})`, color: "text-gray-500 bg-gray-500/10 border-border" };
+       insight = { text: `Underpriced (Avg: ₹${Math.round(avgDeal).toLocaleString()})`, color: "text-foreground-subtle bg-foreground/5 border-border" };
     }
   }
 
@@ -92,7 +92,7 @@ export function DealCard({ deal, onMoveStage, onClick, onDeleteDeal }: DealCardP
           </div>
           <div>
             <h4 className="font-bold text-sm tracking-tight leading-tight">{deal.brand}</h4>
-            <p className="text-[11px] text-gray-500 leading-tight">{deal.deliverable}</p>
+            <p className="text-[11px] text-foreground-muted leading-tight">{deal.deliverable}</p>
             {insight && (
                <div className={`px-1.5 py-0.5 mt-1.5 rounded border text-[9px] font-bold tracking-wide w-fit ${insight.color}`}>
                   {insight.text}
@@ -104,7 +104,7 @@ export function DealCard({ deal, onMoveStage, onClick, onDeleteDeal }: DealCardP
         {/* 3-dots menu — rendered in a fixed-position container to escape overflow clipping */}
         <div ref={menuRef} className="relative z-20" onClick={e => e.stopPropagation()}>
           <button
-            className="text-gray-400 hover:text-primary transition-colors p-1 rounded hover:bg-black/5 dark:hover:bg-white/5 opacity-0 group-hover:opacity-100 focus:opacity-100"
+            className="text-foreground-subtle hover:text-primary transition-colors p-1 rounded hover:bg-foreground/5 opacity-0 group-hover:opacity-100 focus:opacity-100"
             onClick={(e) => { e.stopPropagation(); setShowDropdown(prev => !prev); setShowMoveMenu(false); }}
           >
             <MoreHorizontal size={16} />
@@ -136,7 +136,7 @@ export function DealCard({ deal, onMoveStage, onClick, onDeleteDeal }: DealCardP
                     <button
                       key={s}
                       onClick={(e) => { e.stopPropagation(); onMoveStage(s); setShowDropdown(false); setShowMoveMenu(false); }}
-                      className={`w-full text-left px-4 py-1.5 text-xs hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-between ${deal.stage === s ? 'text-primary font-bold' : 'text-gray-600 dark:text-gray-400'}`}
+                      className={`w-full text-left px-4 py-1.5 text-xs hover:bg-foreground/5 flex items-center justify-between ${deal.stage === s ? 'text-primary font-bold' : 'text-foreground-muted'}`}
                     >
                       {s}
                       {deal.stage === s && <CheckCircle2 size={12} />}
@@ -166,13 +166,13 @@ export function DealCard({ deal, onMoveStage, onClick, onDeleteDeal }: DealCardP
       </div>
 
       <div className="flex items-center gap-2 mb-3">
-        <span className="px-2 py-0.5 rounded border border-border bg-black/5 dark:bg-[#1b1e27] text-gray-500 dark:text-gray-400 text-[10px] font-semibold uppercase tracking-wider">{deal.platform}</span>
+        <span className="px-2 py-0.5 rounded border border-border bg-foreground/5 text-foreground-muted text-[10px] font-semibold uppercase tracking-wider">{deal.platform}</span>
         <span className="font-bold text-success-text text-sm">₹{deal.value.toLocaleString()}</span>
       </div>
 
       {/* Stage move hint pill — visible always so user knows they can move it */}
       <div
-        className="flex items-center gap-1 text-[10px] font-bold text-gray-400 dark:text-gray-600 mb-3 group-hover:text-primary transition-colors"
+        className="flex items-center gap-1 text-[10px] font-bold text-foreground-subtle mb-3 group-hover:text-primary transition-colors"
         onClick={e => { e.stopPropagation(); setShowDropdown(true); }}
         title="Click ··· or drag to move stage"
       >
@@ -181,7 +181,7 @@ export function DealCard({ deal, onMoveStage, onClick, onDeleteDeal }: DealCardP
       </div>
 
       <div className="flex items-center justify-between pt-3 border-t border-border/50">
-        <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium whitespace-nowrap">
+        <div className="flex items-center gap-1.5 text-xs text-foreground-muted font-medium whitespace-nowrap">
           {deal.isCompleted ? <CheckCircle2 size={12} className="text-success-text" /> : (deal.isOverdue ? <AlertCircle size={12} className="text-danger-text" /> : <Clock size={12} />)}
           <span className={deal.isOverdue ? 'text-danger-text' : (deal.isDueSoon ? 'text-warning-text' : '')}>
             {formatDate(deal.deadline)}

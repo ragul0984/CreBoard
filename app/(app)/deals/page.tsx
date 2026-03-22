@@ -67,7 +67,7 @@ export default function DealsPage() {
       <div className="shrink-0 p-4 border-b border-border flex items-center justify-between bg-card text-sm w-full">
         <div className="flex items-center gap-4 flex-1">
           <div className="relative w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-subtle" size={16} />
             <input 
               type="text" 
               value={searchQuery}
@@ -79,7 +79,7 @@ export default function DealsPage() {
           
           <button 
             onClick={() => setSortOption(sortOption === 'value' ? 'deadline' : 'value')}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-colors font-medium ${sortOption ? 'border-primary text-primary bg-primary/10' : 'border-border text-gray-600 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5'}`}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-colors font-medium ${sortOption ? 'border-primary text-primary bg-primary/10' : 'border-border text-foreground-muted hover:bg-foreground/5'}`}
           >
             <SortDesc size={14} />
             Sort: {sortOption === 'value' ? 'Value' : (sortOption === 'deadline' ? 'Deadline' : 'Default')}

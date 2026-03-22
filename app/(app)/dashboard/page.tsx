@@ -80,7 +80,7 @@ export default function Dashboard() {
     <div className="p-6 max-w-6xl mx-auto space-y-6">
       <div className="mb-4">
         <h1 className="text-xl font-bold mb-1">Dashboard</h1>
-        <p className="text-gray-500 text-sm dark:text-gray-400">Welcome back! Here's your business overview.</p>
+        <p className="text-foreground-muted text-sm">Welcome back! Here's your business overview.</p>
       </div>
 
       {/* 1. Smart Alerts */}
@@ -105,7 +105,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-card border border-border p-5 rounded-2xl flex flex-col relative overflow-hidden">
           <div className="flex justify-between items-start mb-4">
-            <span className="text-xs font-semibold tracking-wider text-gray-500">TOTAL REVENUE (ALL TIME)</span>
+            <span className="text-xs font-semibold tracking-wider text-foreground-muted uppercase">TOTAL REVENUE (ALL TIME)</span>
             <div className="p-2 bg-success-bg text-success-text rounded-xl">
               <IndianRupee size={18} />
             </div>
@@ -116,7 +116,7 @@ export default function Dashboard() {
 
         <div className="bg-card border border-border p-5 rounded-2xl flex flex-col relative overflow-hidden">
           <div className="flex justify-between items-start mb-4">
-            <span className="text-xs font-semibold tracking-wider text-gray-500">ACTIVE DEALS</span>
+            <span className="text-xs font-semibold tracking-wider text-foreground-muted uppercase">ACTIVE DEALS</span>
             <div className="p-2 bg-primary/20 text-primary rounded-xl">
               <Layers size={18} />
             </div>
@@ -127,7 +127,7 @@ export default function Dashboard() {
 
         <div className="bg-card border border-border p-5 rounded-2xl flex flex-col relative overflow-hidden">
           <div className="flex justify-between items-start mb-4">
-            <span className="text-xs font-semibold tracking-wider text-gray-500">PENDING PAY</span>
+            <span className="text-xs font-semibold tracking-wider text-foreground-muted uppercase">PENDING PAY</span>
             <div className="p-2 bg-warning-bg bg-opacity-40 text-warning-text rounded-xl">
               <Clock size={18} />
             </div>
@@ -138,7 +138,7 @@ export default function Dashboard() {
 
         <div className="bg-card border border-border p-5 rounded-2xl flex flex-col relative overflow-hidden">
           <div className="flex justify-between items-start mb-4">
-            <span className="text-xs font-semibold tracking-wider text-gray-500">OVERDUE</span>
+            <span className="text-xs font-semibold tracking-wider text-foreground-muted uppercase">OVERDUE</span>
             <div className="p-2 bg-danger-bg bg-opacity-40 text-danger-text rounded-xl">
               <AlertCircle size={18} />
             </div>
@@ -152,7 +152,7 @@ export default function Dashboard() {
         <div className="lg:col-span-2 bg-card border border-border p-5 rounded-2xl h-[340px] flex flex-col">
           <div className="flex justify-between items-start mb-2">
             <div>
-              <h3 className="text-gray-500 dark:text-gray-400 font-medium text-xs mb-1">Monthly Revenue ({currentYear})</h3>
+              <h3 className="text-foreground-muted font-medium text-xs mb-1">Monthly Revenue ({currentYear})</h3>
               <p className="text-2xl font-bold">₹{thisYearCollected.toLocaleString()}</p>
             </div>
             <div className="px-3 py-1 rounded-full bg-success-bg/30 text-success-text border border-success-text/20 text-xs font-bold flex items-center gap-1">
@@ -164,7 +164,7 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="bg-card border border-border p-5 rounded-2xl h-[340px] flex flex-col relative">
-          <h3 className="text-gray-500 dark:text-gray-400 font-medium text-xs mb-4">Lifetime Platform Revenue</h3>
+          <h3 className="text-foreground-muted font-medium text-xs mb-4">Lifetime Platform Revenue</h3>
           <div className="flex-1 mt-0">
             <PlatformDonutChart data={platformData} />
           </div>
@@ -179,7 +179,7 @@ export default function Dashboard() {
           <div className="p-1 overflow-x-auto flex-1">
              <table className="w-full text-left text-sm whitespace-nowrap">
                 <thead>
-                    <tr className="text-gray-500 text-xs font-semibold tracking-wider">
+                    <tr className="text-foreground-muted text-xs font-semibold tracking-wider">
                         <th className="px-4 py-4 uppercase">Brand</th>
                         <th className="px-4 py-4 uppercase">Platform</th>
                         <th className="px-4 py-4 uppercase">Value</th>
@@ -187,23 +187,23 @@ export default function Dashboard() {
                         <th className="px-4 py-4 uppercase">Deadline</th>
                     </tr>
                 </thead>
-                <tbody className="text-gray-700 dark:text-gray-300 font-medium text-sm">
+                <tbody className="text-foreground font-medium text-sm">
                   {recentDeals.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="py-6 text-center text-gray-400 text-xs tracking-widest uppercase">No Active Deals Found</td>
+                      <td colSpan={5} className="py-6 text-center text-foreground-subtle text-xs tracking-widest uppercase">No Active Deals Found</td>
                     </tr>
                   ) : (
                     recentDeals.map(d => (
-                    <tr key={d.id} className="hover:bg-black/5 dark:hover:bg-white/[0.02] transition-colors rounded-lg group">
-                        <td className="px-4 py-3 text-black dark:text-white group-hover:bg-black/5 dark:group-hover:bg-white/[0.02] rounded-l-lg">{d.brand}</td>
-                        <td className="px-4 py-3 group-hover:bg-black/5 dark:group-hover:bg-white/[0.02]">
-                          <span className="px-2 py-0.5 rounded-md bg-black/5 dark:bg-[#1b1e27] text-gray-500 dark:text-gray-400 text-xs font-medium border border-border">{d.platform}</span>
+                    <tr key={d.id} className="hover:bg-foreground/5 transition-colors rounded-lg group">
+                        <td className="px-4 py-3 text-foreground group-hover:bg-foreground/5 rounded-l-lg">{d.brand}</td>
+                        <td className="px-4 py-3 group-hover:bg-foreground/5">
+                          <span className="px-2 py-0.5 rounded-md bg-foreground/5 text-foreground-muted text-xs font-medium border border-border">{d.platform}</span>
                         </td>
-                        <td className="px-4 py-3 text-success-text group-hover:bg-black/5 dark:group-hover:bg-white/[0.02]">₹{d.value.toLocaleString()}</td>
-                        <td className="px-4 py-3 group-hover:bg-black/5 dark:group-hover:bg-white/[0.02]">
+                        <td className="px-4 py-3 text-success-text group-hover:bg-foreground/5">₹{d.value.toLocaleString()}</td>
+                        <td className="px-4 py-3 group-hover:bg-foreground/5">
                           <span className={`${d.stage === 'Delivered' ? 'text-primary' : d.stage === 'Paid' ? 'text-success-text' : 'text-warning-text'} font-bold`}>{d.stage}</span>
                         </td>
-                        <td className="px-4 py-3 text-gray-500 group-hover:bg-black/5 dark:group-hover:bg-white/[0.02] rounded-r-lg">{d.deadline}</td>
+                        <td className="px-4 py-3 text-foreground-muted group-hover:bg-foreground/5 rounded-r-lg">{d.deadline}</td>
                     </tr>
                     ))
                   )}
@@ -219,15 +219,15 @@ export default function Dashboard() {
            </div>
            <div className="p-4 space-y-3 flex-1 overflow-y-auto">
              {actionableItems.length === 0 ? (
-                <div className="text-sm text-gray-500 font-bold p-6 text-center border-2 border-dashed border-border rounded-xl">You're completely caught up! 🔥</div>
+                <div className="text-sm text-foreground-muted font-bold p-6 text-center border-2 border-dashed border-border rounded-xl">You're completely caught up! 🔥</div>
              ) : (
                 actionableItems.slice(0, 6).map((item, i) => (
-                  <div key={i} className={`flex items-start gap-3 p-3 rounded-xl border ${item.type === 'urgent' ? 'border-danger-text/20 bg-danger-bg/5 text-danger-text' : item.type === 'warning' ? 'border-warning-text/20 bg-warning-bg/5 text-warning-text' : item.type === 'success' ? 'border-success-text/20 bg-success-text/5 text-success-text' : 'border-border bg-black/5 dark:bg-white/5 text-gray-700 dark:text-gray-300'}`}>
+                  <div key={i} className={`flex items-start gap-3 p-3 rounded-xl border ${item.type === 'urgent' ? 'border-danger-text/20 bg-danger-bg/5 text-danger-text' : item.type === 'warning' ? 'border-warning-text/20 bg-warning-bg/5 text-warning-text' : item.type === 'success' ? 'border-success-text/20 bg-success-text/5 text-success-text' : 'border-border bg-foreground/5 text-foreground'}`}>
                      <div className="shrink-0 mt-0.5">{item.icon}</div>
                      <div className="flex-1">
                         <p className="text-sm font-bold">{item.text}</p>
                      </div>
-                     <button className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 transition-colors shrink-0">
+                     <button className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded bg-foreground/10 hover:bg-foreground/20 transition-colors shrink-0">
                        {item.action}
                      </button>
                   </div>

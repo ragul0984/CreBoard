@@ -12,7 +12,7 @@ export function MonthlyRevenueChart({ data }: { data: any[] }) {
             dataKey="name" 
             axisLine={false} 
             tickLine={false} 
-            tick={{ fill: '#6b7280', fontSize: 12 }} 
+            tick={{ fill: 'var(--fg-muted)', fontSize: 12 }} 
             dy={10}
           />
           <Tooltip 

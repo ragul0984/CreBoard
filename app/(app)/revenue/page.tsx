@@ -150,7 +150,7 @@ export default function RevenueHub() {
                           {selectedLedgerItem.source === 'deal' ? (
                              <span className="bg-primary/10 border border-primary/20 text-primary px-2.5 py-1 rounded-md text-xs tracking-wide">Dynamic: CRM Deal Board</span>
                           ) : (
-                             <span className="bg-gray-500/10 border border-gray-500/20 text-gray-600 dark:text-gray-400 px-2.5 py-1 rounded-md text-xs tracking-wide">Manual: Direct Income Entry</span>
+                             <span className="bg-gray-500/10 border border-gray-500/20 text-foreground-muted px-2.5 py-1 rounded-md text-xs tracking-wide">Manual: Direct Income Entry</span>
                           )}
                        </div>
                     </div>

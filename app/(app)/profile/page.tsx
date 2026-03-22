@@ -5,8 +5,7 @@ import { User, Mail, Shield, BarChart3, Layers, IndianRupee, Bell, ExternalLink 
 export default function ProfilePage() {
   const deals = useStore(state => state.deals);
   const revenue = useStore(state => state.revenue);
-  const userId = useStore(state => state.userId);
-  const userEmail = deals.length > 0 ? "ragul652778@gmail.com" : "User Account"; // Fallback for display if we don't fetch email correctly yet
+  const userEmail = useStore(state => state.userEmail) || "User Account";
 
   const totalRevenue = revenue.reduce((sum, r) => sum + r.amount, 0);
   const activeDeals = deals.filter(d => !d.isCompleted).length;
@@ -34,7 +33,7 @@ export default function ProfilePage() {
                 <h2 className="text-xl font-black text-foreground mb-1">Creator Account</h2>
                 <div className="flex items-center gap-2 text-sm text-foreground-muted bg-foreground/5 px-3 py-1 rounded-full w-fit">
                   <Mail size={12} />
-                  <span>ragul652778@gmail.com</span>
+                  <span>{userEmail}</span>
                 </div>
               </div>
             </div>
