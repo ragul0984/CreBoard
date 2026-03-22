@@ -29,7 +29,7 @@ const STAGE_HEADER_COLORS: Record<string, string> = {
 function DroppableColumn({ stage, stageDeals, onUpdateDealStage, setSelectedDeal, onDeleteDeal }: any) {
   const { setNodeRef, isOver } = useDroppable({ id: stage });
   return (
-    <div className="flex flex-col min-w-[280px] md:min-w-0">
+    <div className="flex flex-col w-full">
       <div className="flex items-center justify-between mb-3 px-1">
         <h3 className={`font-bold text-xs uppercase tracking-widest flex items-center gap-2 ${STAGE_HEADER_COLORS[stage] || 'text-foreground-muted'}`}>
           {stage}
@@ -125,7 +125,7 @@ export function KanbanBoard({ deals, onUpdateDealStage, onDeleteDeal }: KanbanBo
     <>
       <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={handleDragEnd}>
         <div
-          className="flex md:grid md:grid-cols-7 gap-4 pb-4 items-start w-full overflow-x-auto md:overflow-x-visible snap-x"
+          className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 md:gap-6 pb-6 items-start w-full"
         >
           {STAGES.map(stage => {
             const stageDeals = deals.filter(d => d.stage === stage);

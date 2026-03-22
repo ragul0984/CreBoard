@@ -46,40 +46,40 @@ export default function DealsPage() {
     <div className="flex flex-col h-full bg-[var(--color-background)] overflow-hidden">
       <div className="shrink-0 p-6 border-b border-border bg-card/50">
         <h1 className="text-2xl font-bold mb-4">Deals Board</h1>
-        <div className="flex gap-6">
-          <div className="flex flex-col">
-            <span className="text-xs text-gray-500 font-semibold tracking-wider">TOTAL BOARD VALUE</span>
-            <span className="text-2xl font-bold text-success-text">₹{totalBoardValue.toLocaleString()}</span>
+        <div className="flex gap-6 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+          <div className="flex flex-col shrink-0">
+            <span className="text-[10px] font-bold text-foreground-muted uppercase tracking-widest mb-1">TOTAL BOARD VALUE</span>
+            <span className="text-xl md:text-2xl font-black text-success-text">₹{totalBoardValue.toLocaleString()}</span>
           </div>
-          <div className="w-px bg-border my-2"></div>
-          <div className="flex flex-col">
-            <span className="text-xs text-gray-500 font-semibold tracking-wider">ACTIVE DEALS</span>
-            <span className="text-2xl font-bold text-primary">{activeDealsCount}</span>
+          <div className="w-px bg-border my-2 shrink-0"></div>
+          <div className="flex flex-col shrink-0">
+            <span className="text-[10px] font-bold text-foreground-muted uppercase tracking-widest mb-1">ACTIVE DEALS</span>
+            <span className="text-xl md:text-2xl font-black text-primary">{activeDealsCount}</span>
           </div>
-          <div className="w-px bg-border my-2"></div>
-          <div className="flex flex-col">
-            <span className="text-xs text-gray-500 font-semibold tracking-wider">CLOSING RATE</span>
-            <span className="text-2xl font-bold text-warning-text">{closingRate}%</span>
+          <div className="w-px bg-border my-2 shrink-0"></div>
+          <div className="flex flex-col shrink-0">
+            <span className="text-[10px] font-bold text-foreground-muted uppercase tracking-widest mb-1">CLOSING RATE</span>
+            <span className="text-xl md:text-2xl font-black text-warning-text">{closingRate}%</span>
           </div>
         </div>
       </div>
 
-      <div className="shrink-0 p-4 border-b border-border flex items-center justify-between bg-card text-sm w-full">
-        <div className="flex items-center gap-4 flex-1">
-          <div className="relative w-64">
+      <div className="shrink-0 p-4 border-b border-border flex flex-col sm:flex-row items-stretch sm:items-center justify-between bg-card text-sm w-full gap-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
+          <div className="relative flex-1 sm:max-w-xs">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground-subtle" size={16} />
             <input 
               type="text" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search deals..." 
-              className="w-full pl-9 pr-4 py-1.5 rounded-lg border border-border bg-black/5 dark:bg-white/5 focus:outline-none focus:border-primary transition-colors"
+              className="w-full pl-9 pr-4 py-2 rounded-lg border border-border bg-foreground/5 focus:outline-none focus:border-primary transition-colors text-sm font-medium"
             />
           </div>
           
           <button 
             onClick={() => setSortOption(sortOption === 'value' ? 'deadline' : 'value')}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-colors font-medium ${sortOption ? 'border-primary text-primary bg-primary/10' : 'border-border text-foreground-muted hover:bg-foreground/5'}`}
+            className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg border transition-colors font-bold text-xs uppercase tracking-wider ${sortOption ? 'border-primary text-primary bg-primary/10' : 'border-border text-foreground-muted hover:bg-foreground/5'}`}
           >
             <SortDesc size={14} />
             Sort: {sortOption === 'value' ? 'Value' : (sortOption === 'deadline' ? 'Deadline' : 'Default')}
@@ -88,9 +88,9 @@ export default function DealsPage() {
 
         <button 
           onClick={() => setIsNewDealOpen(true)}
-          className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white transition-colors font-medium shadow-sm"
+          className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-primary hover:bg-primary-hover text-white transition-colors font-bold text-sm shadow-md"
         >
-          <Plus size={16} />
+          <Plus size={18} />
           New Deal
         </button>
       </div>
