@@ -121,6 +121,51 @@ const FEATURES = [
   }
 ];
 
+const GRID_FEATURES = [
+  {
+    icon: '🎯',
+    title: 'Deal Tracker',
+    description: 'Organize all your brand collaborations in one place with clear deal details and status tracking.',
+  },
+  {
+    icon: '💰',
+    title: 'Payment Tracking',
+    description: 'Monitor every payment, from pending to received, and never miss a payment again.',
+  },
+  {
+    icon: '📈',
+    title: 'Revenue Dashboard',
+    description: 'Get real-time insights into your total revenue, earnings trends, and income sources.',
+  },
+  {
+    icon: '👥',
+    title: 'Brand CRM',
+    description: 'Keep all brand contacts, collaboration history, and communication details organized.',
+  },
+  {
+    icon: '📄',
+    title: 'Invoice Generator',
+    description: 'Create professional invoices in seconds and send them directly to brands.',
+  },
+  {
+    icon: '⚖️',
+    title: 'Contract AI',
+    description: 'AI-powered contract review and suggestions to protect your interests.',
+  },
+  {
+    icon: '🤖',
+    title: 'AI Pricing',
+    description: 'Smart pricing suggestions based on your audience and content performance.',
+    comingSoon: true,
+  },
+  {
+    icon: '🏪',
+    title: 'Brand Marketplace',
+    description: 'Discover brand collaboration opportunities that match your audience.',
+    comingSoon: true,
+  }
+];
+
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-[#E4E4E7] selection:bg-[#4CE3BC] selection:text-black font-sans antialiased overflow-x-hidden">
@@ -218,6 +263,42 @@ export default function LandingPage() {
         {FEATURES.map((feature, i) => (
           <FeatureCard key={i} feature={feature} i={i} />
         ))}
+      </section>
+
+      {/* Powerful Features Grid */}
+      <section className="py-32 px-6 relative z-10 bg-[#0A0A0B]">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white text-center mb-16">
+            Powerful features for creators
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {GRID_FEATURES.map((feature, i) => (
+              <div 
+                key={i} 
+                className="p-8 rounded-2xl bg-[#121316] border border-white/5 hover:border-white/10 transition-colors flex flex-col items-start gap-3 hover:bg-[#16171b]"
+              >
+                <div className="text-3xl mb-1">
+                  {feature.icon}
+                </div>
+                
+                {feature.comingSoon && (
+                  <span className="inline-flex px-2.5 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-bold uppercase tracking-widest">
+                    Coming Soon
+                  </span>
+                )}
+                
+                <h3 className="text-[19px] font-bold text-white leading-tight">
+                  {feature.title}
+                </h3>
+                
+                <p className="text-[14px] text-zinc-400 leading-relaxed font-medium">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* Global Security Section */}
