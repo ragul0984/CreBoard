@@ -19,6 +19,35 @@
   
   --color-danger-bg: var(--danger-bg);
   --color-danger-text: var(--danger-text);
+
+  --animate-gradient: gradient 6s linear infinite;
+  --animate-pulse-slow: pulse-slow 4s ease-in-out infinite;
+  --background-size-300: 300% 300%;
+
+  @keyframes gradient {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  @keyframes pulse-slow {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+  }
+}
+
+@utility perspective-1000 {
+  perspective: 1000px;
+}
+
+@utility rotate-x-2 {
+  transform: rotateX(2deg);
+}
+
+@utility -rotate-y-1 {
+  transform: rotateY(-1deg);
+}
+
+@utility bg-300\% {
+  background-size: 300% 300%;
 }
 
 :root {

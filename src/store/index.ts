@@ -36,6 +36,7 @@ export type RevenueRecord = {
 
 interface AppState {
   isInitialized: boolean;
+  isInitializing: boolean;
   deals: Deal[];
   payments: Payment[];
   revenue: RevenueRecord[];
@@ -66,34 +67,43 @@ interface AppState {
 
 export const useStore = create<AppState>((set, get) => ({
   isInitialized: false,
+  isInitializing: false,
+  userId: null,
+  userEmail: null,
+
   deals: [],
   payments: [],
   revenue: [],
   brands: [],
   contracts: [],
   contentTasks: [],
-  userId: null,
-  userEmail: null,
 
   initializeStore: async () => {
+    if (get().isInitializing) {
+      console.log('⏳ Store initialization already in progress, skipping call.');
+      return;
+    }
+
+    set({ isInitializing: true });
     console.log('📦 Calling initializeStore...');
     const supabase = createClient();
-    console.log('📡 Fetching user session...');
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
     
-    if (userError || !user) {
-      console.warn('❌ Auth check failed in store:', userError || 'No user found');
-      return;
-    }
-
-    if (get().isInitialized && get().userId === user.id) {
-      console.log('✅ Store already initialized for current user, skipping.');
-      return;
-    }
-
-    console.log('👤 Initializing store for:', user.email);
-
     try {
+      console.log('📡 Fetching user session...');
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        console.warn('❌ Auth check failed in store:', userError || 'No user found');
+        return;
+      }
+
+      if (get().isInitialized && get().userId === user.id) {
+        console.log('✅ Store already initialized for current user, skipping.');
+        return;
+      }
+
+      console.log('👤 Initializing store for:', user.email);
+
       const [dealsRes, paymentsRes, revenueRes, brandsRes, tasksRes] = await Promise.all([
         supabase.from('deals').select('*').order('deadline', { ascending: true }),
         supabase.from('payments').select('*').order('due_date', { ascending: true }),
@@ -171,7 +181,9 @@ export const useStore = create<AppState>((set, get) => ({
       });
       console.log('Store initialized with data from Supabase');
     } catch (error) {
-      console.error('Failed to fetch from Supabase:', error);
+      console.error('Failed to initialize store:', error);
+    } finally {
+      set({ isInitializing: false });
     }
   },
 

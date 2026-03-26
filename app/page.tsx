@@ -1,175 +1,288 @@
 'use client';
+
 import Link from 'next/link';
-import { ArrowRight, BarChart3, Briefcase, DollarSign, Zap, Star, ChevronRight, Sparkles, TrendingUp, Users, Calendar, Shield } from 'lucide-react';
-import { useState } from 'react';
+import { 
+  ArrowRight, 
+  BarChart3, 
+  Briefcase, 
+  DollarSign, 
+  Zap, 
+  ChevronRight, 
+  Sparkles, 
+  Shield, 
+  Globe, 
+  MousePointer2,
+  CheckCircle2,
+  Lock,
+  LayoutDashboard
+} from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
+
+function FeatureCard({ feature, i }: { feature: any, i: number }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  
+  const { scrollYProgress } = useScroll({
+    target: cardRef,
+    offset: ["start end", "end start"]
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
+
+  // Scale the image up slightly as we scroll past it to create depth
+  const imageScale = useTransform(smoothProgress, [0, 0.5, 1], [0.9, 1, 1.15]);
+
+  return (
+    <div 
+      ref={cardRef}
+      id={i === 2 ? 'intelligence' : undefined}
+      className="sticky top-0 w-full h-screen flex items-center justify-center px-6"
+    >
+      <motion.div 
+        className="w-full max-w-6xl aspect-auto lg:aspect-[2/1] bg-[#0A0A0B] rounded-[40px] border border-white/5 shadow-[0_-20px_60px_rgba(0,0,0,0.6)] flex flex-col lg:flex-row overflow-hidden absolute"
+        style={{
+          top: `calc(10vh + ${i * 40}px)`, 
+          height: '80vh'
+        }}
+        initial={{ opacity: 0, y: 150 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+      >
+        {/* Left Content bg-[#0A0A0B] ensures it overlays perfectly when stacked */}
+        <div className="w-full lg:w-1/2 p-10 lg:p-20 flex flex-col justify-center relative z-20 bg-[#0A0A0B]">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#4CE3BC]/20 to-[#25AAE1]/20 border border-[#4CE3BC]/30 flex items-center justify-center mb-8 text-[#4CE3BC]">
+            <feature.icon size={28} />
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-6">
+            {feature.title}
+          </h2>
+          <p className="text-lg text-zinc-400 font-medium leading-relaxed max-w-md">
+            {feature.description}
+          </p>
+        </div>
+
+        {/* Right Image */}
+        <div className="w-full lg:w-1/2 relative min-h-[400px] lg:min-h-full border-t lg:border-t-0 lg:border-l border-white/10 bg-zinc-950/50 flex items-center justify-center p-6 lg:p-12 overflow-hidden">
+          <div className="w-full aspect-video rounded-xl border border-white/10 shadow-2xl relative bg-zinc-900 group overflow-hidden">
+             
+             {/* Fake browser window chrome */}
+             <div className="absolute top-0 left-0 right-0 h-8 bg-zinc-950/90 border-b border-white/5 flex items-center px-4 gap-2 z-20 backdrop-blur-md">
+                <div className="w-2.5 h-2.5 rounded-full bg-red-500/50 border border-red-500/20"></div>
+                <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50 border border-yellow-500/20"></div>
+                <div className="w-2.5 h-2.5 rounded-full bg-green-500/50 border border-green-500/20"></div>
+             </div>
+             
+             {/* Scroll-scaling Image with additional Hover Scale */}
+             <div className="absolute inset-x-0 bottom-0 top-8 overflow-hidden rounded-b-xl flex justify-center items-start origin-top transition-transform duration-700 ease-out group-hover:scale-[1.03]">
+               <motion.img 
+                 style={{ scale: imageScale }}
+                 src={feature.image} 
+                 alt={feature.title} 
+                 className="w-full h-full object-contain object-top opacity-90 group-hover:opacity-100 transition-opacity duration-500 origin-top"
+               />
+             </div>
+             
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
 
 const NAV_LINKS = [
-  { label: 'Features', href: '#features' },
-  { label: 'Workflow', href: '#how-it-works' },
-  { label: 'Testimonials', href: '#testimonials' },
+  { label: 'System', href: '#system' },
+  { label: 'Intelligence', href: '#intelligence' },
+  { label: 'Security', href: '#security' },
 ];
 
 const FEATURES = [
   {
     icon: Briefcase,
-    title: 'Brand Deal Management',
-    description: 'A visual control center for every partnership. Track leads, deliverables, and payment status in one matte-finished board.',
+    title: 'Brand Operations',
+    description: 'A unified control center for enterprise-level creator partnerships. Manage every deliverable with precision.',
+    image: '/landing/dash_main.png'
   },
   {
     icon: DollarSign,
-    title: 'Revenue Intelligence',
-    description: 'Deep analytics into your income streams. Identify underpricing and discover your most profitable platforms instantly.',
+    title: 'Revenue Engine',
+    description: 'Automated income tracking and underpricing detection. Turn your creative output into a predictable financial system.',
+    image: '/landing/dash_deals.png'
   },
   {
     icon: BarChart3,
-    title: 'Automated Tracking',
-    description: 'Real-time monitoring of invoice health. Get alerted the second a payment becomes overdue without lifting a finger.',
-  },
-  {
-    icon: Users,
-    title: 'Brand CRM',
-    description: 'Build a private database of every brand you work with. Monitor their payment reliability and historical deal values.',
-  },
-  {
-    icon: Zap,
-    title: 'Smart Alerts',
-    description: 'Proactive dashboard notifications that surface risks before they hit your bank account.',
-  },
-  {
-    icon: Calendar,
-    title: 'Strategic Planning',
-    description: 'An integrated content calendar that syncs with your deal deadlines for a unified execution roadmap.',
-  },
+    title: 'Macro Intelligence',
+    description: 'Deep-dive analytics into audience value and platform ROI. Make decisions based on data, not intuition.',
+    image: '/landing/dash_analytics.png'
+  }
 ];
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#050505] text-[#f5f5f5] selection:bg-white selection:text-black">
+    <div className="min-h-screen bg-[#0A0A0B] text-[#E4E4E7] selection:bg-[#4CE3BC] selection:text-black font-sans antialiased overflow-x-hidden">
       
-      {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#1a1a1a] bg-[#050505]/70 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded bg-[#f5f5f5] text-black flex items-center justify-center font-black text-sm">C</div>
-            <span className="text-lg font-bold tracking-tight">CreBoard</span>
+      {/* Subtle Grid Background */}
+      <div className="fixed inset-0 z-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-[100] border-b border-white/5 bg-[#0A0A0B]/60 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#4CE3BC] to-[#25AAE1] flex items-center justify-center font-black text-black text-sm">C</div>
+            <span className="text-lg font-bold tracking-tight text-white">CreBoard</span>
           </div>
-          <div className="hidden md:flex items-center gap-10">
+          
+          <div className="hidden md:flex items-center gap-8">
             {NAV_LINKS.map(link => (
-              <a key={link.label} href={link.href} className="text-[13px] text-[#888] hover:text-[#f5f5f5] transition-colors font-medium tracking-wide lowercase">{link.label}</a>
+              <a key={link.label} href={link.href} className="text-xs font-semibold text-zinc-500 hover:text-white transition-colors uppercase tracking-widest">{link.label}</a>
             ))}
           </div>
-          <Link href="/login" className="px-6 py-2.5 bg-[#f5f5f5] text-black text-[13px] font-bold rounded-full hover:bg-[#e0e0e0] transition-all flex items-center gap-2 uppercase tracking-widest">
-            Dashboard <ArrowRight size={14} />
-          </Link>
+
+          <div className="flex items-center gap-4">
+            <Link href="/login" className="text-xs font-bold text-zinc-400 hover:text-white transition-colors">Login</Link>
+            <Link href="/dashboard" className="px-5 py-2 bg-[#4CE3BC] text-black text-[11px] font-bold rounded-full hover:bg-white transition-all uppercase tracking-wider shadow-[0_0_20px_rgba(76,227,188,0.2)]">
+              Get Started
+            </Link>
+          </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-48 pb-32 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#1a1a1a] bg-[#0a0a0a] text-[11px] font-bold text-[#666] mb-10 tracking-[0.2em] uppercase">
-             Version 1.0 — Out Now
-          </div>
+      <section className="relative pt-40 pb-20 px-6 z-10">
+        <div className="max-w-5xl mx-auto text-center">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#4CE3BC]/20 bg-[#4CE3BC]/5 text-[10px] font-bold text-[#4CE3BC] mb-8 tracking-[0.2em] uppercase"
+          >
+             <Sparkles size={10}/> The Creator Operating System
+          </motion.div>
 
-          <h1 className="text-6xl md:text-8xl font-bold tracking-tight leading-[0.95] mb-8 text-white">
-            Own the business<br />behind your content.
-          </h1>
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-6xl md:text-8xl font-bold tracking-tight leading-[0.9] mb-8 text-white"
+          >
+            Own your system.<br /> 
+            <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#4CE3BC] to-[#25AAE1]">Scale your brand.</span>
+          </motion.h1>
 
-          <p className="text-lg md:text-xl text-[#888] max-w-2xl mx-auto mb-12 font-medium leading-relaxed">
-            The operating system for modern creators. Track deals, manage payments, and monitor revenue in a workspace designed for extreme productivity.
-          </p>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-lg text-zinc-500 max-w-xl mx-auto mb-10 font-medium leading-relaxed"
+          >
+            A high-performance infrastructure designed for the modern creator business. Automate deal workflows, track real revenue, and centralize operations.
+          </motion.p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <Link href="/login" className="px-10 py-4 bg-[#f5f5f5] text-black font-bold rounded-xl hover:bg-white transition-all text-sm uppercase tracking-widest flex items-center gap-2">
-              Start Building <ArrowRight size={16} />
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20"
+          >
+            <Link href="/dashboard" className="w-full sm:w-auto px-8 py-4 bg-[#4CE3BC] text-black font-bold rounded-xl hover:bg-white transition-all text-sm uppercase tracking-widest flex items-center justify-center gap-2 group">
+              Get Started <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </Link>
-            <a href="#features" className="px-10 py-4 border border-[#1a1a1a] text-[#f5f5f5] font-bold rounded-xl hover:bg-[#111] transition-all text-sm uppercase tracking-widest">
-              Explore Tools
+            <a href="#system" className="w-full sm:w-auto px-8 py-4 border border-zinc-800 text-white font-bold rounded-xl hover:bg-zinc-900 transition-all text-sm uppercase tracking-widest flex items-center justify-center gap-2">
+              The Platform <ChevronRight size={16} />
+            </a>
+          </motion.div>
+
+          {/* Isometric Hero Preview */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="relative max-w-5xl mx-auto rounded-3xl overflow-hidden border border-white/5 shadow-2xl bg-zinc-900"
+          >
+             <img 
+               src="/landing/dash_main.png" 
+               alt="Dashboard" 
+               className="w-full h-auto opacity-80"
+             />
+             <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0B] via-transparent to-transparent opacity-60" />
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Sticky Stacking Cards Feature Sections */}
+      <section id="system" className="relative w-full z-10 pb-40 pt-10">
+        {FEATURES.map((feature, i) => (
+          <FeatureCard key={i} feature={feature} i={i} />
+        ))}
+      </section>
+
+      {/* Global Security Section */}
+      <section id="security" className="py-32 px-6 relative z-10 border-t border-white/5 bg-[#0D0D0E]">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="md:col-span-1">
+             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-zinc-800 bg-zinc-900 text-[10px] font-bold text-zinc-400 mb-6 tracking-widest uppercase">
+                <Lock size={10}/> Enterprise Protection
+             </div>
+             <h3 className="text-4xl font-bold tracking-tight text-white mb-6">Your data, encrypted.</h3>
+             <p className="text-zinc-500 font-medium">Built on military-grade Supabase infrastructure. Your private deal history and revenue numbers never leave your secure environment.</p>
+          </div>
+          
+          <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {[
+              { title: 'RLS Security', desc: 'Row Level Security ensures you only see your own data.', icon: Shield },
+              { title: 'Multi-Platform', desc: 'Centralized dashboard for YouTube, Instagram, and more.', icon: Globe },
+              { title: 'Zero Lag', desc: 'Real-time synchronization across all your devices.', icon: Zap },
+              { title: 'Smart CRM', desc: 'Historical brand reliability insights automated.', icon: CheckCircle2 }
+            ].map((item, i) => (
+              <div key={i} className="p-8 rounded-2xl bg-zinc-950/50 border border-white/5 hover:border-[#4CE3BC]/30 transition-all flex flex-col gap-4">
+                <div className="w-10 h-10 rounded-lg bg-zinc-900 flex items-center justify-center text-[#4CE3BC]">
+                  <item.icon size={20} />
+                </div>
+                <h4 className="text-lg font-bold text-white">{item.title}</h4>
+                <p className="text-sm text-zinc-500">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-40 px-6 text-center relative z-10 overflow-hidden">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-10 leading-[1.1]">
+            Initialize your creative<br /> operating system.
+          </h2>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/dashboard" className="px-10 py-5 bg-[#4CE3BC] text-black font-bold rounded-xl hover:bg-white transition-all text-sm uppercase tracking-widest flex items-center gap-2 group">
+              Start Building <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <a href="#system" className="px-10 py-5 border border-zinc-800 text-white font-bold rounded-xl hover:bg-zinc-900 transition-all text-sm uppercase tracking-widest flex items-center gap-2">
+              System Overview <LayoutDashboard size={18} />
             </a>
           </div>
-        </div>
-      </section>
-
-      {/* Features Grid */}
-      <section id="features" className="py-32 px-6 border-t border-[#1a1a1a]">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-l border-t border-[#1a1a1a]">
-            {FEATURES.map((feature, i) => {
-              const Icon = feature.icon;
-              return (
-                <div
-                  key={i}
-                  className="p-10 border-r border-b border-[#1a1a1a] hover:bg-[#0a0a0a] transition-colors"
-                >
-                  <div className="w-10 h-10 flex items-center justify-center mb-8 text-white">
-                    <Icon size={32} strokeWidth={1.5} />
-                  </div>
-                  <h3 className="text-xl font-bold mb-4 text-white uppercase tracking-tight">{feature.title}</h3>
-                  <p className="text-[#666] leading-relaxed text-[15px] font-medium">{feature.description}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Product Highlight */}
-      <section className="py-32 px-6 bg-white text-black">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-            <div>
-              <h2 className="text-4xl md:text-6xl font-bold leading-tight tracking-tight mb-8">
-                Professional tools for professional results.
-              </h2>
-              <p className="text-lg text-black/60 font-medium leading-relaxed mb-10">
-                Spreadsheets aren't enough when your business scales. CreBoard gives you a purpose-built workspace that handles the heavy lifting of CRM and revenue tracking so you can focus on creation.
-              </p>
-              <ul className="space-y-4">
-                {['Real-time Payment Tracking', 'Dynamic Brand Intelligence', 'Integrated Revenue Analytics'].map(item => (
-                  <li key={item} className="flex items-center gap-4 font-bold text-sm tracking-widest uppercase">
-                    <div className="w-5 h-5 bg-black text-white flex items-center justify-center rounded-sm"><ArrowRight size={12} /></div>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="aspect-square bg-black rounded-3xl p-1 shadow-2xl overflow-hidden grayscale hover:grayscale-0 transition-all duration-700">
-               <div className="w-full h-full bg-[#111] border border-white/5 rounded-2xl flex items-center justify-center text-white/10 font-black text-8xl uppercase tracking-tighter italic">
-                 Matte OS
-               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA section */}
-      <section className="py-48 px-6 text-center">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-10">Ready to scale?</h2>
-          <Link href="/dashboard" className="px-12 py-5 bg-[#f5f5f5] text-black font-black rounded-full hover:bg-white transition-all text-lg uppercase tracking-widest shadow-2xl">
-            Get Instant Access
-          </Link>
-          <div className="mt-12 text-[#666] text-xs font-bold uppercase tracking-[0.3em]">
-            No Subscription — Forever Free for Solo Creators
-          </div>
+          <p className="mt-12 text-zinc-600 text-[10px] font-bold uppercase tracking-[0.3em]">
+            Deployment v1.1.0 • Global Network Active
+          </p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-20 px-6 border-t border-[#1a1a1a]">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10">
-          <div className="flex items-center gap-3">
-             <div className="w-6 h-6 rounded bg-white text-black flex items-center justify-center font-black text-[10px]">C</div>
-             <span className="font-bold text-sm tracking-widest uppercase">CreBoard</span>
+      <footer className="py-16 px-6 border-t border-white/5 bg-[#0A0A0B] z-10 relative">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="flex items-center gap-2 grayscale brightness-200">
+            <div className="w-6 h-6 rounded-lg bg-zinc-500 animate-pulse" />
+            <span className="font-bold text-sm tracking-tight text-white/50 uppercase">CreBoard Protocol</span>
           </div>
-          <div className="flex items-center gap-12">
-            {NAV_LINKS.map(link => (
-              <a key={link.label} href={link.href} className="text-xs text-[#444] hover:text-[#f5f5f5] transition-colors font-bold uppercase tracking-widest">{link.label}</a>
-            ))}
+          <div className="flex items-center gap-8">
+            <a href="#" className="text-[10px] font-bold text-zinc-600 hover:text-[#4CE3BC] transition-colors uppercase tracking-widest">Privacy</a>
+            <a href="#" className="text-[10px] font-bold text-zinc-600 hover:text-[#4CE3BC] transition-colors uppercase tracking-widest">Terms</a>
+            <a href="#" className="text-[10px] font-bold text-zinc-600 hover:text-[#4CE3BC] transition-colors uppercase tracking-widest">Status</a>
           </div>
-          <div className="text-[10px] text-[#444] font-bold uppercase tracking-[0.2em]">
-            © {new Date().getFullYear()} / Design by CreBoard
-          </div>
+          <p className="text-[10px] text-zinc-700 font-bold uppercase tracking-widest">© 2026 CreBoard Inc.</p>
         </div>
       </footer>
 
