@@ -3,6 +3,7 @@
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import StoreInitializer from "@/components/StoreInitializer";
+import OnboardingGuard from "@/components/OnboardingGuard";
 import { useState } from "react";
 
 export default function AppLayout({
@@ -15,6 +16,8 @@ export default function AppLayout({
   return (
     <div className="flex min-h-screen bg-background text-foreground">
       <StoreInitializer />
+      <OnboardingGuard />
+      
       {/* Desktop Sidebar */}
       <div className="hidden md:block">
         <Sidebar />

@@ -17,6 +17,7 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
   
   const payments = useStore(state => state.payments);
   const clearStore = useStore(state => state.clearStore);
+  const userName = useStore(state => state.userName);
   const overdueCount = payments.filter(p => p.status === 'Overdue').length;
 
   useEffect(() => {
@@ -73,7 +74,7 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
               </div>
               <div className="hidden lg:block text-right">
                 <p className="text-[10px] font-bold text-foreground-subtle uppercase tracking-widest leading-none mb-1">Account</p>
-                <p className="text-xs font-bold truncate max-w-[150px] text-foreground">{user.email}</p>
+                <p className="text-xs font-bold truncate max-w-[150px] text-foreground">{userName || user.email}</p>
               </div>
             </Link>
 

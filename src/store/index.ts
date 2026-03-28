@@ -45,6 +45,8 @@ interface AppState {
   brands: BrandProfile[];
   userId: string | null;
   userEmail: string | null;
+  userName: string | null;
+  isOnboarded: boolean | undefined;
 
   initializeStore: () => Promise<void>;
   clearStore: () => void;
@@ -70,6 +72,8 @@ export const useStore = create<AppState>((set, get) => ({
   isInitializing: false,
   userId: null,
   userEmail: null,
+  userName: null,
+  isOnboarded: undefined,
 
   deals: [],
   payments: [],
@@ -104,12 +108,13 @@ export const useStore = create<AppState>((set, get) => ({
 
       console.log('👤 Initializing store for:', user.email);
 
-      const [dealsRes, paymentsRes, revenueRes, brandsRes, tasksRes] = await Promise.all([
+      const [dealsRes, paymentsRes, revenueRes, brandsRes, tasksRes, profileRes] = await Promise.all([
         supabase.from('deals').select('*').order('deadline', { ascending: true }),
         supabase.from('payments').select('*').order('due_date', { ascending: true }),
         supabase.from('revenue').select('*').order('date', { ascending: false }),
         supabase.from('brands').select('*').order('name', { ascending: true }),
-        supabase.from('content_tasks').select('*').order('due_date', { ascending: true })
+        supabase.from('content_tasks').select('*').order('due_date', { ascending: true }),
+        supabase.from('profiles').select('*').eq('id', user.id).maybeSingle()
       ]);
 
       const fetchedDeals: Deal[] = (dealsRes.data || []).map(d => ({
@@ -177,6 +182,8 @@ export const useStore = create<AppState>((set, get) => ({
         contentTasks: fetchedTasks,
         userId: user.id,
         userEmail: user.email || null,
+        userName: profileRes.data?.full_name || null,
+        isOnboarded: profileRes.data?.is_onboarded || false,
         isInitialized: true
       });
       console.log('Store initialized with data from Supabase');
@@ -197,7 +204,9 @@ export const useStore = create<AppState>((set, get) => ({
       contracts: [],
       contentTasks: [],
       userId: null,
-      userEmail: null
+      userEmail: null,
+      userName: null,
+      isOnboarded: undefined
     });
     console.log('🧹 Store cleared');
   },

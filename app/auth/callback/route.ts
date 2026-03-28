@@ -4,8 +4,10 @@ import { NextResponse } from 'next/server'
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  // if "next" is in search params, use it as the redirection URL
-  const next = searchParams.get('next') ?? '/dashboard'
+  const type = searchParams.get('type')
+  
+  // If this is a password recovery flow, redirect to the reset page instead of dashboard
+  const next = type === 'recovery' ? '/reset-password' : (searchParams.get('next') ?? '/dashboard')
 
   if (code) {
     const supabase = await createClient()
