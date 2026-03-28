@@ -39,16 +39,16 @@ BEGIN
     RAISE EXCEPTION 'Not authenticated';
   END IF;
 
-  -- Security Definer functions run as the database superuser, giving us the permission to delete from auth.users
-  DELETE FROM auth.users WHERE id = v_user_id;
-
-  -- The cascaded deletion should automatically handle their profiles, deals, revenue, and payments if cascade constraints are present.
-  -- To be extremely thorough, we can explicitly wipe their App schema data here before wiping the auth record:
+  -- IMPORTANT: Delete from child/app tables FIRST to avoid FK constraint violations
+  DELETE FROM public.content_tasks WHERE user_id = v_user_id;
   DELETE FROM public.revenue WHERE user_id = v_user_id;
   DELETE FROM public.payments WHERE user_id = v_user_id;
   DELETE FROM public.deals WHERE user_id = v_user_id;
   DELETE FROM public.brands WHERE user_id = v_user_id;
-  DELETE FROM public.content_tasks WHERE user_id = v_user_id;
-  
+  DELETE FROM public.profiles WHERE id = v_user_id;
+
+  -- Finally, delete the auth identity (no more FK references blocking this)
+  DELETE FROM auth.users WHERE id = v_user_id;
+
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

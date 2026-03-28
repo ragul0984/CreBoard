@@ -45,15 +45,16 @@ export default function OnboardingGuard() {
     setLoading(true);
     setError('');
     
-    // Direct Profile Update (OTP Network Request Bypassed)
-    const { error: dbError } = await supabase.from('profiles').update({
+    // Upsert: creates the profile row if new user, updates if existing
+    const { error: dbError } = await supabase.from('profiles').upsert({
+      id: userId,
       full_name: fullName,
       gender: gender,
       dob: dob,
       phone: phone,
       is_onboarded: true,
       updated_at: new Date()
-    }).eq('id', userId);
+    });
 
     if (dbError) {
       setError("Database Error: " + dbError.message);
