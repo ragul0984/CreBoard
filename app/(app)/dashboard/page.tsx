@@ -1,7 +1,7 @@
-'use client';
 import { IndianRupee, Layers, Clock, AlertCircle, AlertTriangle, Zap, User, FileText, Youtube } from 'lucide-react';
 import { MonthlyRevenueChart, PlatformDonutChart } from '@/components/Charts';
 import { useStore } from '@/src/store';
+import Link from 'next/link';
 
 export default function Dashboard() {
   const revenue = useStore(state => state.revenue);
@@ -31,12 +31,11 @@ export default function Dashboard() {
   // What Should I Do Today? (Actionable Items)
   const today = new Date();
   const next48h = new Date(today.getTime() + 48 * 60 * 60 * 1000);
-  
-  const actionableItems: { type: string, text: string, icon: React.ReactNode, action: string }[] = [];
+    const actionableItems: { type: string, text: string, icon: React.ReactNode, action: string, href?: string }[] = [];
   
   payments.filter(p => p.status === 'Overdue').forEach(p => actionableItems.push({ type: 'urgent', text: `Follow up with ${p.brand} for ₹${p.amount.toLocaleString()}`, icon: <AlertCircle size={14} />, action: 'Follow Up' }));
   deals.filter(d => !d.isCompleted && d.stage !== 'Lost' && new Date(d.deadline) <= next48h).forEach(d => actionableItems.push({ type: 'warning', text: `Deliver ${d.deliverable} for ${d.brand}`, icon: <Clock size={14} />, action: 'Deliver' }));
-  deals.filter(d => d.stage === 'Delivered').forEach(d => actionableItems.push({ type: 'success', text: `Generate Invoice for ${d.brand}`, icon: <FileText size={14} />, action: 'Invoice' }));
+  deals.filter(d => d.stage === 'Delivered').forEach(d => actionableItems.push({ type: 'success', text: `Generate Invoice for ${d.brand}`, icon: <FileText size={14} />, action: 'Invoice', href: `/invoices/${d.id}` }));
   contentTasks?.filter(t => t.status !== 'Posted' && t.dueDate && new Date(t.dueDate) <= today).forEach(t => actionableItems.push({ type: 'info', text: `Post ${t.title} on ${t.platform}`, icon: <Youtube size={14} />, action: 'Post' }));
 
   // Monthly Chart Compute
@@ -227,9 +226,18 @@ export default function Dashboard() {
                      <div className="flex-1">
                         <p className="text-sm font-bold">{item.text}</p>
                      </div>
-                     <button className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded bg-foreground/10 hover:bg-foreground/20 transition-colors shrink-0">
-                       {item.action}
-                     </button>
+                     {item.href ? (
+                        <Link 
+                          href={item.href}
+                          className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded bg-foreground/10 hover:bg-foreground/20 transition-colors shrink-0"
+                        >
+                          {item.action}
+                        </Link>
+                      ) : (
+                        <button className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded bg-foreground/10 hover:bg-foreground/20 transition-colors shrink-0">
+                          {item.action}
+                        </button>
+                      )}
                   </div>
                 ))
              )}

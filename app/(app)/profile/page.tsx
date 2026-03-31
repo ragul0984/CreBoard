@@ -10,6 +10,20 @@ export default function ProfilePage() {
   const revenue = useStore(state => state.revenue);
   const userName = useStore(state => state.userName);
   const userEmail = useStore(state => state.userEmail) || "User Account";
+  const updateProfile = useStore(state => state.updateProfile);
+
+  // Pro Fields State
+  const billingAddress = useStore(state => state.billingAddress);
+  const panGst = useStore(state => state.panGst);
+  const upiId = useStore(state => state.upiId);
+  const bankAccount = useStore(state => state.bankAccount);
+  const bankIfsc = useStore(state => state.bankIfsc);
+
+  const [editBilling, setEditBilling] = useState(billingAddress);
+  const [editPanGst, setEditPanGst] = useState(panGst);
+  const [editUpi, setEditUpi] = useState(upiId);
+  const [editBankAcc, setEditBankAcc] = useState(bankAccount);
+  const [editBankIfsc, setEditBankIfsc] = useState(bankIfsc);
 
   const totalRevenue = revenue.reduce((sum, r) => sum + r.amount, 0);
   const activeDeals = deals.filter(d => !d.isCompleted).length;
@@ -61,10 +75,12 @@ export default function ProfilePage() {
   };
 
   const saveProfile = async () => {
-    if (!userId) return;
+    await useStore.getState().updateProfile({ 
+      full_name: editName, 
+      gender: editGender, 
+      dob: editDob 
+    });
     setIsEditingProfile(false);
-    await supabase.from('profiles').update({ full_name: editName, gender: editGender, dob: editDob, updated_at: new Date() }).eq('id', userId);
-    window.location.reload(); // Quick global state re-hydration
   };
 
   const deleteAccount = async () => {
@@ -225,6 +241,83 @@ export default function ProfilePage() {
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Professional & Billing Details */}
+          <div className="bg-card border border-border p-6 rounded-3xl space-y-6 animate-in fade-in duration-700">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
+                <IndianRupee size={16} className="text-primary"/> Professional & Billing Details
+              </h3>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-[10px] font-bold text-foreground-subtle uppercase tracking-widest mb-1 block">Billing Address</label>
+                <textarea 
+                  value={editBilling} 
+                  onChange={e => setEditBilling(e.target.value)}
+                  className="w-full bg-[#16171C] border border-white/5 text-sm rounded-lg py-2.5 px-3 text-white focus:border-[#4CE3BC]/50 focus:outline-none min-h-[80px]"
+                  placeholder="Street, City, State, ZIP"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] font-bold text-foreground-subtle uppercase tracking-widest mb-1 block">PAN / GST Number</label>
+                  <input 
+                    type="text" 
+                    value={editPanGst} 
+                    onChange={e => setEditPanGst(e.target.value)}
+                    className="w-full bg-[#16171C] border border-white/5 text-sm rounded-lg py-2.5 px-3 text-white focus:border-[#4CE3BC]/50 focus:outline-none"
+                    placeholder="Optional for invoices"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-foreground-subtle uppercase tracking-widest mb-1 block">UPI ID (Primary)</label>
+                  <input 
+                    type="text" 
+                    value={editUpi} 
+                    onChange={e => setEditUpi(e.target.value)}
+                    className="w-full bg-[#16171C] border border-white/5 text-sm rounded-lg py-2.5 px-3 text-white focus:border-[#4CE3BC]/50 focus:outline-none"
+                    placeholder="user@upi"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-foreground-subtle uppercase tracking-widest mb-1 block">Bank Account No.</label>
+                  <input 
+                    type="text" 
+                    value={editBankAcc} 
+                    onChange={e => setEditBankAcc(e.target.value)}
+                    className="w-full bg-[#16171C] border border-white/5 text-sm rounded-lg py-2.5 px-3 text-white focus:border-[#4CE3BC]/50 focus:outline-none"
+                    placeholder="For bank transfers"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-foreground-subtle uppercase tracking-widest mb-1 block">IFSC Code</label>
+                  <input 
+                    type="text" 
+                    value={editBankIfsc} 
+                    onChange={e => setEditBankIfsc(e.target.value)}
+                    className="w-full bg-[#16171C] border border-white/5 text-sm rounded-lg py-2.5 px-3 text-white focus:border-[#4CE3BC]/50 focus:outline-none"
+                    placeholder="Bank Branch Code"
+                  />
+                </div>
+              </div>
+              
+              <button 
+                onClick={() => updateProfile({ 
+                  billing_address: editBilling, 
+                  pan_gst: editPanGst, 
+                  upi_id: editUpi, 
+                  bank_account: editBankAcc, 
+                  bank_ifsc: editBankIfsc 
+                })}
+                className="w-full py-3 bg-primary text-black text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:bg-white transition-all shadow-lg shadow-primary/10"
+              >
+                Sync Professional Files
+              </button>
+            </div>
           </div>
 
           <div className="bg-card border border-border p-6 rounded-3xl space-y-6">

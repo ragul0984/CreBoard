@@ -47,6 +47,13 @@ interface AppState {
   userEmail: string | null;
   userName: string | null;
   isOnboarded: boolean | undefined;
+  
+  // Professional Details
+  billingAddress: string;
+  panGst: string;
+  upiId: string;
+  bankAccount: string;
+  bankIfsc: string;
 
   initializeStore: () => Promise<void>;
   clearStore: () => void;
@@ -65,6 +72,7 @@ interface AppState {
   deletePayment: (id: string) => Promise<void>;
   deleteRevenue: (id: string) => Promise<void>;
   deleteBrand: (id: string) => void;
+  updateProfile: (updates: { full_name?: string; gender?: string; dob?: string; billing_address?: string; pan_gst?: string; upi_id?: string; bank_account?: string; bank_ifsc?: string; }) => Promise<void>;
 }
 
 export const useStore = create<AppState>((set, get) => ({
@@ -81,6 +89,12 @@ export const useStore = create<AppState>((set, get) => ({
   brands: [],
   contracts: [],
   contentTasks: [],
+
+  billingAddress: '',
+  panGst: '',
+  upiId: '',
+  bankAccount: '',
+  bankIfsc: '',
 
   initializeStore: async () => {
     if (get().isInitializing) {
@@ -184,7 +198,13 @@ export const useStore = create<AppState>((set, get) => ({
         userEmail: user.email || null,
         userName: profileRes.data?.full_name || null,
         isOnboarded: profileRes.data?.is_onboarded || false,
-        isInitialized: true
+        isInitialized: true,
+        // Pro Fields
+        billingAddress: profileRes.data?.billing_address || '',
+        panGst: profileRes.data?.pan_gst || '',
+        upiId: profileRes.data?.upi_id || '',
+        bankAccount: profileRes.data?.bank_account || '',
+        bankIfsc: profileRes.data?.bank_ifsc || ''
       });
       console.log('Store initialized with data from Supabase');
     } catch (error) {
@@ -525,5 +545,32 @@ export const useStore = create<AppState>((set, get) => ({
     const supabase = createClient();
     set(state => ({ brands: state.brands.filter(b => b.id !== id) }));
     await supabase.from('brands').delete().eq('id', id);
+  },
+  
+  updateProfile: async (updates) => {
+    const supabase = createClient();
+    const userId = get().userId;
+    if (!userId) return;
+
+    const dbUpdates: any = { updated_at: new Date() };
+    if (updates.full_name !== undefined) dbUpdates.full_name = updates.full_name;
+    if (updates.gender !== undefined) dbUpdates.gender = updates.gender;
+    if (updates.dob !== undefined) dbUpdates.dob = updates.dob;
+    if (updates.billing_address !== undefined) dbUpdates.billing_address = updates.billing_address;
+    if (updates.pan_gst !== undefined) dbUpdates.pan_gst = updates.pan_gst;
+    if (updates.upi_id !== undefined) dbUpdates.upi_id = updates.upi_id;
+    if (updates.bank_account !== undefined) dbUpdates.bank_account = updates.bank_account;
+    if (updates.bank_ifsc !== undefined) dbUpdates.bank_ifsc = updates.bank_ifsc;
+
+    set(state => ({
+       userName: updates.full_name !== undefined ? updates.full_name : state.userName,
+       billingAddress: updates.billing_address !== undefined ? updates.billing_address : state.billingAddress,
+       panGst: updates.pan_gst !== undefined ? updates.pan_gst : state.panGst,
+       upiId: updates.upi_id !== undefined ? updates.upi_id : state.upiId,
+       bankAccount: updates.bank_account !== undefined ? updates.bank_account : state.bankAccount,
+       bankIfsc: updates.bank_ifsc !== undefined ? updates.bank_ifsc : state.bankIfsc
+    }));
+
+    await supabase.from('profiles').update(dbUpdates).eq('id', userId);
   }
 }));
