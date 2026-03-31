@@ -53,8 +53,8 @@ function FeatureCard({ feature, i }: { feature: any, i: number }) {
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.8, ease: "easeOut" }}
       >
-        {/* Left Content bg-[#0A0A0B] ensures it overlays perfectly when stacked */}
-        <div className="w-full lg:w-1/2 p-10 lg:p-20 flex flex-col justify-center relative z-20 bg-[#0A0A0B]">
+        {/* Left Content bg-transparent allows the fixed background to show through */}
+        <div className="w-full lg:w-1/2 p-10 lg:p-20 flex flex-col justify-center relative z-20 bg-transparent">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#4CE3BC]/20 to-[#25AAE1]/20 border border-[#4CE3BC]/30 flex items-center justify-center mb-8 text-[#4CE3BC]">
             <feature.icon size={28} />
           </div>
@@ -105,19 +105,19 @@ const FEATURES = [
     icon: Briefcase,
     title: 'Brand Operations',
     description: 'A unified control center for enterprise-level creator partnerships. Manage every deliverable with precision.',
-    image: '/landing/dash_main.png'
-  },
-  {
-    icon: DollarSign,
-    title: 'Revenue Engine',
-    description: 'Automated income tracking and underpricing detection. Turn your creative output into a predictable financial system.',
     image: '/landing/dash_deals.png'
   },
   {
     icon: BarChart3,
-    title: 'Macro Intelligence',
-    description: 'Deep-dive analytics into audience value and platform ROI. Make decisions based on data, not intuition.',
+    title: 'Revenue Engine',
+    description: 'Real-time financial visibility. Track your earnings across every platform and campaign automatically.',
     image: '/landing/dash_analytics.png'
+  },
+  {
+    icon: Zap,
+    title: 'Macro Intelligence',
+    description: 'Data-driven insights to scale your brand. Use historical performance to predict future deal value.',
+    image: '/landing/dash_main.png'
   }
 ];
 
@@ -166,12 +166,28 @@ const GRID_FEATURES = [
   }
 ];
 
+
+import BorderGlow from '@/components/ui/BorderGlow';
+
+import DarkVeil from '@/components/ui/DarkVeil';
+import GlareHover from '@/components/ui/GlareHover';
+
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-[#E4E4E7] selection:bg-[#4CE3BC] selection:text-black font-sans antialiased overflow-x-hidden">
       
-      {/* Subtle Grid Background */}
-      <div className="fixed inset-0 z-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+      {/* Dynamic WebGL Background */}
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-40">
+        <DarkVeil
+          hueShift={0}
+          noiseIntensity={0}
+          scanlineIntensity={0}
+          speed={0.5}
+          scanlineFrequency={0}
+          warpAmount={0}
+          resolutionScale={1}
+        />
+      </div>
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-[100] border-b border-white/5 bg-[#0A0A0B]/60 backdrop-blur-xl">
@@ -200,60 +216,61 @@ export default function LandingPage() {
       <section className="relative pt-40 pb-20 px-6 z-10">
         <div className="max-w-5xl mx-auto text-center">
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#4CE3BC]/20 bg-[#4CE3BC]/5 text-[10px] font-bold text-[#4CE3BC] mb-8 tracking-[0.2em] uppercase"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#4CE3BC]/30 bg-[#4CE3BC]/10 text-[10px] font-bold text-[#4CE3BC] mb-8 tracking-widest uppercase"
           >
-             <Sparkles size={10}/> The Creator Operating System
+            <Sparkles size={12}/> The Creator Operating System
           </motion.div>
-
+          
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-6xl md:text-8xl font-bold tracking-tight leading-[0.9] mb-8 text-white"
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-6xl md:text-8xl font-black tracking-tighter text-white mb-8 leading-[0.9]"
           >
-            Own your system.<br /> 
-            <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#4CE3BC] to-[#25AAE1]">Scale your brand.</span>
+            Own your <span className="text-zinc-600">system.</span><br />
+            Scale your <span className="bg-gradient-to-r from-[#4CE3BC] to-[#25AAE1] bg-clip-text text-transparent italic">brand.</span>
           </motion.h1>
-
+          
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg text-zinc-500 max-w-xl mx-auto mb-10 font-medium leading-relaxed"
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto mb-12 font-medium leading-relaxed"
           >
             A high-performance infrastructure designed for the modern creator business. Automate deal workflows, track real revenue, and centralize operations.
           </motion.p>
-
+          
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20"
           >
-            <Link href="/dashboard" className="w-full sm:w-auto px-8 py-4 bg-[#4CE3BC] text-black font-bold rounded-xl hover:bg-white transition-all text-sm uppercase tracking-widest flex items-center justify-center gap-2 group">
+            <Link href="/dashboard" className="px-8 py-4 bg-[#4CE3BC] text-black font-bold rounded-xl hover:bg-white transition-all text-xs uppercase tracking-widest flex items-center gap-2 group">
               Get Started <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </Link>
-            <a href="#system" className="w-full sm:w-auto px-8 py-4 border border-zinc-800 text-white font-bold rounded-xl hover:bg-zinc-900 transition-all text-sm uppercase tracking-widest flex items-center justify-center gap-2">
+            <a href="#system" className="px-8 py-4 border border-zinc-800 text-white font-bold rounded-xl hover:bg-zinc-900 transition-all text-xs uppercase tracking-widest flex items-center gap-2">
               The Platform <ChevronRight size={16} />
             </a>
           </motion.div>
 
-          {/* Isometric Hero Preview */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className="relative max-w-5xl mx-auto rounded-3xl overflow-hidden border border-white/5 shadow-2xl bg-zinc-900"
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.6 }}
+            className="relative max-w-5xl mx-auto"
           >
-             <img 
-               src="/landing/dash_main.png" 
-               alt="Dashboard" 
-               className="w-full h-auto opacity-80"
-             />
-             <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0B] via-transparent to-transparent opacity-60" />
+            <div className="absolute inset-x-0 -top-40 -bottom-40 bg-gradient-to-t from-[#0A0A0B] via-transparent to-transparent z-20 pointer-events-none" />
+            <div className="relative rounded-3xl border border-white/10 bg-zinc-900 shadow-2xl overflow-hidden group">
+               <div className="absolute inset-0 bg-gradient-to-tr from-[#4CE3BC]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+               <img src="/landing/dash_main.png" alt="Dashboard Preview" className="w-full relative z-10 scale-105 group-hover:scale-100 transition-transform duration-[2s] ease-out" />
+            </div>
+            
+            {/* Ambient Glow */}
+            <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-3/4 h-64 bg-[#4CE3BC]/20 blur-[120px] rounded-full pointer-events-none z-0" />
           </motion.div>
         </div>
       </section>
@@ -266,7 +283,7 @@ export default function LandingPage() {
       </section>
 
       {/* Powerful Features Grid */}
-      <section className="py-32 px-6 relative z-10 bg-[#0A0A0B]">
+      <section className="py-32 px-6 relative z-10 bg-transparent">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white text-center mb-16">
             Powerful features for creators
@@ -274,9 +291,13 @@ export default function LandingPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {GRID_FEATURES.map((feature, i) => (
-              <div 
+              <BorderGlow
                 key={i} 
-                className="p-8 rounded-2xl bg-[#121316] border border-white/5 hover:border-white/10 transition-colors flex flex-col items-start gap-3 hover:bg-[#16171b]"
+                className="p-8 h-full flex flex-col items-start gap-3"
+                borderRadius={16}
+                backgroundColor="#121316"
+                colors={['#4CE3BC', '#25AAE1', '#a855f7']}
+                animated={i === 0}
               >
                 <div className="text-3xl mb-1">
                   {feature.icon}
@@ -295,14 +316,14 @@ export default function LandingPage() {
                 <p className="text-[14px] text-zinc-400 leading-relaxed font-medium">
                   {feature.description}
                 </p>
-              </div>
+              </BorderGlow>
             ))}
           </div>
         </div>
       </section>
 
       {/* Global Security Section */}
-      <section id="security" className="py-32 px-6 relative z-10 border-t border-white/5 bg-[#0D0D0E]">
+      <section id="security" className="py-32 px-6 relative z-10 border-t border-white/5 bg-transparent">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
           <div className="md:col-span-1">
              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-zinc-800 bg-zinc-900 text-[10px] font-bold text-zinc-400 mb-6 tracking-widest uppercase">
@@ -319,13 +340,22 @@ export default function LandingPage() {
               { title: 'Zero Lag', desc: 'Real-time synchronization across all your devices.', icon: Zap },
               { title: 'Smart CRM', desc: 'Historical brand reliability insights automated.', icon: CheckCircle2 }
             ].map((item, i) => (
-              <div key={i} className="p-8 rounded-2xl bg-zinc-950/50 border border-white/5 hover:border-[#4CE3BC]/30 transition-all flex flex-col gap-4">
+              <GlareHover
+                key={i}
+                className="flex flex-col gap-4 p-8"
+                background="rgba(9, 9, 11, 0.5)" // zinc-950/50
+                borderColor="rgba(255, 255, 255, 0.05)" // white/5
+                borderRadius="16px"
+                glareColor="#4CE3BC"
+                glareOpacity={0.15}
+                transitionDuration={1000}
+              >
                 <div className="w-10 h-10 rounded-lg bg-zinc-900 flex items-center justify-center text-[#4CE3BC]">
                   <item.icon size={20} />
                 </div>
                 <h4 className="text-lg font-bold text-white">{item.title}</h4>
                 <p className="text-sm text-zinc-500">{item.desc}</p>
-              </div>
+              </GlareHover>
             ))}
           </div>
         </div>
@@ -352,7 +382,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-16 px-6 border-t border-white/5 bg-[#0A0A0B] z-10 relative">
+      <footer className="py-16 px-6 border-t border-white/5 bg-transparent z-10 relative">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex items-center gap-2 grayscale brightness-200">
             <div className="w-6 h-6 rounded-lg bg-zinc-500 animate-pulse" />
