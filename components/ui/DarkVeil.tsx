@@ -171,9 +171,10 @@ export default function DarkVeil({
     handleResize();
 
     // 5. Animation Loop
+    let isActive = true;
     const start = performance.now();
     const loop = () => {
-      if (!programRef.current || !rendererRef.current || !meshRef.current) return;
+      if (!isActive || !programRef.current || !rendererRef.current || !meshRef.current) return;
       
       programRef.current.uniforms.uTime.value = ((performance.now() - start) / 1000) * speed;
       rendererRef.current.render({ scene: meshRef.current });
@@ -184,6 +185,7 @@ export default function DarkVeil({
 
     // 6. Cleanup
     return () => {
+      isActive = false;
       if (requestRef.current) cancelAnimationFrame(requestRef.current);
       window.removeEventListener('resize', handleResize);
       

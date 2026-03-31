@@ -15,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased font-sans scroll-smooth" suppressHydrationWarning>
       <body className="min-h-full text-[var(--color-foreground)] bg-[var(--color-background)]">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} forcedTheme="dark">
           {children}
         </ThemeProvider>
       </body>
