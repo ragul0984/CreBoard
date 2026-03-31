@@ -1,3 +1,4 @@
+'use client';
 import { IndianRupee, Layers, Clock, AlertCircle, AlertTriangle, Zap, User, FileText, Youtube } from 'lucide-react';
 import { MonthlyRevenueChart, PlatformDonutChart } from '@/components/Charts';
 import { useStore } from '@/src/store';
