@@ -40,12 +40,12 @@ export function DealDrawer({ deal, onClose }: DealDrawerProps) {
           {/* Key Details */}
           <div className="grid grid-cols-2 gap-4">
              <div className="bg-foreground/[0.02] p-4 rounded-xl border border-border">
-               <span className="text-foreground-muted text-[10px] font-bold uppercase tracking-widest">DEAL VALUE</span>
-               <div className="text-xl font-black text-success-text mt-1">₹{deal.value.toLocaleString()}</div>
+                <span className="text-foreground-muted text-[10px] font-bold uppercase tracking-widest">DEAL VALUE</span>
+                <div className="text-xl font-black text-success-text mt-1">₹{deal.value.toLocaleString()}</div>
              </div>
              <div className="bg-foreground/[0.02] p-4 rounded-xl border border-border">
-               <span className="text-foreground-muted text-[10px] font-bold uppercase tracking-widest">DEADLINE</span>
-               <div className="text-lg font-black mt-1 text-foreground">{formatDateObj(deal.deadline)}</div>
+                <span className="text-foreground-muted text-[10px] font-bold uppercase tracking-widest">DEADLINE</span>
+                <div className="text-lg font-black mt-1 text-foreground">{formatDateObj(deal.deadline)}</div>
              </div>
           </div>
           
@@ -78,27 +78,14 @@ export function DealDrawer({ deal, onClose }: DealDrawerProps) {
             </div>
           </div>
           
-          {/* Linked Items */}
-          <div>
-             <h3 className="text-xs font-bold uppercase tracking-widest mb-3 flex items-center gap-2 text-foreground-muted">Linked Documents</h3>
-             <div className="flex gap-3">
-                <button className="flex-1 py-2.5 rounded-lg border border-border hover:bg-foreground/5 text-xs font-bold uppercase tracking-wide flex items-center justify-center gap-2 transition-colors">
-                  <FileText size={14} className="text-primary" /> Contract
-                </button>
-                <button className="flex-1 py-2.5 rounded-lg border border-border hover:bg-foreground/5 text-xs font-bold uppercase tracking-wide flex items-center justify-center gap-2 transition-colors">
-                  <IndianRupee size={14} className="text-success-text" /> Invoice
-                </button>
-             </div>
-          </div>
-
           {/* Notes Log */}
           <div>
             <h3 className="text-xs font-bold uppercase tracking-widest mb-3 flex items-center gap-2 text-foreground-muted">
                <MessageSquare size={16} className="text-primary"/> Conversation & Notes
             </h3>
             <div className="flex gap-2">
-               <input type="text" placeholder="Add a note..." className="flex-1 px-3 py-2.5 rounded-lg border border-border bg-foreground/5 focus:outline-none focus:border-primary text-sm font-medium text-foreground" />
-               <button className="px-5 py-2.5 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary-hover transition-colors shadow-md">Post</button>
+                <input type="text" placeholder="Add a note..." className="flex-1 px-3 py-2.5 rounded-lg border border-border bg-foreground/5 focus:outline-none focus:border-primary text-sm font-medium text-foreground" />
+                <button className="px-5 py-2.5 bg-primary text-white rounded-lg text-sm font-bold hover:bg-primary-hover transition-colors shadow-md">Post</button>
             </div>
           </div>
         </div>
