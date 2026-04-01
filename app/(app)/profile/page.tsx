@@ -17,7 +17,6 @@ export default function ProfilePage() {
 
   const [emailAlerts, setEmailAlerts] = useState(true);
   const [weeklyReports, setWeeklyReports] = useState(false);
-  const [isTestingEmail, setIsTestingEmail] = useState(false);
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [editName, setEditName] = useState('');
@@ -122,26 +121,6 @@ export default function ProfilePage() {
     stopLoading();
   };
 
-  const testEmail = async () => {
-    if (!weeklyReports) {
-      alert("Please enable Weekly Reports first to test the dispatch!");
-      return;
-    }
-    setIsTestingEmail(true);
-    try {
-      const res = await fetch('/api/email/weekly', { method: 'POST' });
-      const data = await res.json();
-      if (data.success) {
-        alert("Success! The Weekly Report has been dispatched to your inbox.");
-      } else {
-        alert("Dispatch Error: " + (data.message || data.error));
-      }
-    } catch (err) {
-      alert("Network Error: Failed to hit the email API dispatch route.");
-    } finally {
-      setIsTestingEmail(false);
-    }
-  };
 
   return (
     <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-8">
@@ -275,17 +254,6 @@ export default function ProfilePage() {
                  </div>
               </div>
               
-              {/* Test Email Dispatcher */}
-              <div className="pt-4 mt-2 border-t border-white/5">
-                <button 
-                  onClick={testEmail}
-                  disabled={isTestingEmail}
-                  className="w-full py-3 bg-zinc-900 border border-white/10 text-white text-xs font-bold rounded-xl hover:bg-zinc-800 hover:border-primary/50 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest"
-                >
-                  {isTestingEmail ? <Loader2 size={14} className="animate-spin text-primary" /> : <Send size={14} className="text-primary" />}
-                  {isTestingEmail ? 'Dispatching via Resend...' : 'Send Test Weekly Report'}
-                </button>
-              </div>
 
             </div>
           </div>
