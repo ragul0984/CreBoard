@@ -13,6 +13,7 @@ export default function Dashboard() {
   const currentYear = new Date().getFullYear();
 
   // Compute Stats
+  const today = new Date();
   const totalCollected = revenue.reduce((sum, r) => sum + r.amount, 0);
   const explicitPending = payments.filter(p => p.status === 'Pending').reduce((sum, p) => sum + p.amount, 0);
   const deliveredDealsValue = deals.filter(d => d.stage === 'Delivered' && !d.isCompleted).reduce((sum, d) => sum + d.value, 0);
@@ -20,7 +21,9 @@ export default function Dashboard() {
   
   const activeDealsCount = deals.filter(d => d.stage !== 'Lost' && !d.isCompleted).length;
   const totalDealsCount = deals.length;
-  const overdueCount = payments.filter(p => p.status === 'Overdue').length;
+  
+  const isOverdue = (p: any) => p.status !== 'Paid' && p.dueDate && new Date(p.dueDate) < today;
+  const overdueCount = payments.filter(isOverdue).length;
 
   // Expected vs Actual Cashflow
   const expectedRevenue = deals.filter(d => d.stage !== 'Lost').reduce((sum, d) => sum + d.value, 0);
@@ -29,14 +32,13 @@ export default function Dashboard() {
 
   // Smart Alerts logic
   const pendingDealsCount = payments.filter(p => p.status === 'Pending').length + deals.filter(d => d.stage === 'Delivered' && !d.isCompleted).length;
-  const delayedBrands = brands.filter(b => payments.some(p => p.brand === b.name && p.status === 'Overdue'));
+  const delayedBrands = brands.filter(b => payments.some(p => p.brand === b.name && isOverdue(p)));
 
   // What Should I Do Today? (Actionable Items)
-  const today = new Date();
   const next48h = new Date(today.getTime() + 48 * 60 * 60 * 1000);
    const actionableItems: { type: string, text: string, icon: React.ReactNode, action: string }[] = [];
   
-  payments.filter(p => p.status === 'Overdue').forEach(p => actionableItems.push({ type: 'urgent', text: `Follow up with ${p.brand} for ₹${p.amount.toLocaleString()}`, icon: <AlertCircle size={14} />, action: 'Follow Up' }));
+  payments.filter(isOverdue).forEach(p => actionableItems.push({ type: 'urgent', text: `Follow up with ${p.brand} for ₹${p.amount.toLocaleString()}`, icon: <AlertCircle size={14} />, action: 'Follow Up' }));
   deals.filter(d => !d.isCompleted && d.stage !== 'Lost' && new Date(d.deadline) <= next48h).forEach(d => actionableItems.push({ type: 'warning', text: `Deliver ${d.deliverable} for ${d.brand}`, icon: <Clock size={14} />, action: 'Deliver' }));
   deals.filter(d => d.stage === 'Delivered').forEach(d => actionableItems.push({ type: 'success', text: `Generate Invoice for ${d.brand}`, icon: <FileText size={14} />, action: 'Invoice' }));
   contentTasks?.filter(t => t.status !== 'Posted' && t.dueDate && new Date(t.dueDate) <= today).forEach(t => actionableItems.push({ type: 'info', text: `Post ${t.title} on ${t.platform}`, icon: <Youtube size={14} />, action: 'Post' }));

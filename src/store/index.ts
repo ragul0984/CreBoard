@@ -54,6 +54,7 @@ interface AppState {
   upiId: string;
   bankAccount: string;
   bankIfsc: string;
+  paymentTerms: number;
 
   initializeStore: () => Promise<void>;
   clearStore: () => void;
@@ -72,7 +73,17 @@ interface AppState {
   deletePayment: (id: string) => Promise<void>;
   deleteRevenue: (id: string) => Promise<void>;
   deleteBrand: (id: string) => void;
-  updateProfile: (updates: { full_name?: string; gender?: string; dob?: string; billing_address?: string; pan_gst?: string; upi_id?: string; bank_account?: string; bank_ifsc?: string; }) => Promise<void>;
+  updateProfile: (updates: { 
+    full_name?: string; 
+    gender?: string; 
+    dob?: string; 
+    billing_address?: string; 
+    pan_gst?: string; 
+    upi_id?: string; 
+    bank_account?: string; 
+    bank_ifsc?: string;
+    payment_terms?: number;
+  }) => Promise<void>;
 }
 
 export const useStore = create<AppState>((set, get) => ({
@@ -95,6 +106,7 @@ export const useStore = create<AppState>((set, get) => ({
   upiId: '',
   bankAccount: '',
   bankIfsc: '',
+  paymentTerms: 30,
 
   initializeStore: async () => {
     if (get().isInitializing) {
@@ -204,7 +216,8 @@ export const useStore = create<AppState>((set, get) => ({
         panGst: profileRes.data?.pan_gst || '',
         upiId: profileRes.data?.upi_id || '',
         bankAccount: profileRes.data?.bank_account || '',
-        bankIfsc: profileRes.data?.bank_ifsc || ''
+        bankIfsc: profileRes.data?.bank_ifsc || '',
+        paymentTerms: profileRes.data?.payment_terms || 30
       });
       console.log('Store initialized with data from Supabase');
     } catch (error) {
@@ -397,27 +410,32 @@ export const useStore = create<AppState>((set, get) => ({
     } 
     // LOGIC: If DELIVERED -> Ensure Payment exists (Pending) but REMOVE Revenue
     else if (stage === 'Delivered') {
-       if (existingPayment) {
-          set(state => ({
-            payments: state.payments.map(p => p.id === existingPayment.id ? { ...p, status: 'Pending', receivedDate: null } : p),
-            revenue: state.revenue.filter(r => r.payment_id !== existingPayment.id)
-          }));
-          await supabase.from('payments').update({ status: 'Pending', received_date: null }).eq('id', existingPayment.id);
-          await supabase.from('revenue').delete().eq('payment_id', existingPayment.id);
-       } else {
-          const pId = crypto.randomUUID();
-          set(state => ({
-            payments: [{
-                id: pId, dealId: dealThatMoved.id, dealName: dealThatMoved.deliverable,
-                brand: dealThatMoved.brand, platform: dealThatMoved.platform,
-                amount: dealThatMoved.value, status: 'Pending', dueDate: dealThatMoved.deadline, receivedDate: null
-            }, ...state.payments]
-          }));
-          await supabase.from('payments').insert([{
-            id: pId, user_id: get().userId, deal_id: dealThatMoved.id, amount: dealThatMoved.value,
-            status: 'Pending', due_date: dealThatMoved.deadline, received_date: null
-          }]);
-       }
+      const terms = get().paymentTerms || 30;
+      const todayDate = new Date();
+      todayDate.setDate(todayDate.getDate() + terms);
+      const calculatedDueDate = todayDate.toISOString().split('T')[0];
+
+      if (existingPayment) {
+        set(state => ({
+          payments: state.payments.map(p => p.id === existingPayment.id ? { ...p, status: 'Pending', receivedDate: null, dueDate: calculatedDueDate } : p),
+          revenue: state.revenue.filter(r => r.payment_id !== existingPayment.id)
+        }));
+        await supabase.from('payments').update({ status: 'Pending', received_date: null, due_date: calculatedDueDate }).eq('id', existingPayment.id);
+        await supabase.from('revenue').delete().eq('payment_id', existingPayment.id);
+      } else {
+        const pId = crypto.randomUUID();
+        set(state => ({
+          payments: [{
+            id: pId, dealId: dealThatMoved.id, dealName: dealThatMoved.deliverable,
+            brand: dealThatMoved.brand, platform: dealThatMoved.platform,
+            amount: dealThatMoved.value, status: 'Pending', dueDate: calculatedDueDate, receivedDate: null
+          }, ...state.payments]
+        }));
+        await supabase.from('payments').insert([{
+          id: pId, user_id: get().userId, deal_id: dealThatMoved.id, amount: dealThatMoved.value,
+          status: 'Pending', due_date: calculatedDueDate, received_date: null
+        }]);
+      }
     }
     // LOGIC: Anything else -> Remove Revenue and consider removing Payment
     else {
@@ -568,8 +586,11 @@ export const useStore = create<AppState>((set, get) => ({
        panGst: updates.pan_gst !== undefined ? updates.pan_gst : state.panGst,
        upiId: updates.upi_id !== undefined ? updates.upi_id : state.upiId,
        bankAccount: updates.bank_account !== undefined ? updates.bank_account : state.bankAccount,
-       bankIfsc: updates.bank_ifsc !== undefined ? updates.bank_ifsc : state.bankIfsc
+       bankIfsc: updates.bank_ifsc !== undefined ? updates.bank_ifsc : state.bankIfsc,
+       paymentTerms: (updates as any).payment_terms !== undefined ? (updates as any).payment_terms : state.paymentTerms
     }));
+
+    if ((updates as any).payment_terms !== undefined) dbUpdates.payment_terms = (updates as any).payment_terms;
 
     await supabase.from('profiles').update(dbUpdates).eq('id', userId);
   }

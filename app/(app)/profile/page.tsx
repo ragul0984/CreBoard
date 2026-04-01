@@ -22,6 +22,7 @@ export default function ProfilePage() {
   const [editName, setEditName] = useState('');
   const [editGender, setEditGender] = useState('Prefer not to say');
   const [editDob, setEditDob] = useState('');
+  const [editPaymentTerms, setEditPaymentTerms] = useState('30');
   const [isDeleting, setIsDeleting] = useState(false);
 
   const [newPassword, setNewPassword] = useState('');
@@ -37,13 +38,14 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!userId) return;
     const fetchProfile = async () => {
-      const { data } = await supabase.from('profiles').select('email_alerts, weekly_reports, full_name, gender, dob').eq('id', userId).maybeSingle();
+      const { data } = await supabase.from('profiles').select('email_alerts, weekly_reports, full_name, gender, dob, payment_terms').eq('id', userId).maybeSingle();
       if (data) {
         setEmailAlerts(data.email_alerts ?? true);
         setWeeklyReports(data.weekly_reports ?? false);
         setEditName(data.full_name || '');
         setEditGender(data.gender || 'Prefer not to say');
         setEditDob(data.dob || '');
+        setEditPaymentTerms(String(data.payment_terms || 30));
       }
     };
     fetchProfile();
@@ -66,7 +68,8 @@ export default function ProfilePage() {
     await useStore.getState().updateProfile({ 
       full_name: editName, 
       gender: editGender, 
-      dob: editDob 
+      dob: editDob,
+      payment_terms: parseInt(editPaymentTerms) || 30
     });
     setIsEditingProfile(false);
     stopLoading();
@@ -191,6 +194,10 @@ export default function ProfilePage() {
                   <label className="text-[10px] font-bold text-foreground-subtle uppercase tracking-widest mb-1 block">Date of Birth</label>
                   <p className="text-sm font-bold text-white">{editDob || 'Not Set'}</p>
                 </div>
+                <div>
+                  <label className="text-[10px] font-bold text-foreground-subtle uppercase tracking-widest mb-1 block">Payment Terms</label>
+                  <p className="text-sm font-bold text-white">{editPaymentTerms} Days</p>
+                </div>
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-4 animate-in slide-in-from-top-2">
@@ -211,6 +218,16 @@ export default function ProfilePage() {
                 <div>
                   <label className="text-[10px] font-bold text-foreground-subtle uppercase tracking-widest mb-1 block">Date of Birth</label>
                   <input type="date" value={editDob} onChange={e => setEditDob(e.target.value)} className="w-full bg-[#16171C] border border-white/5 text-sm rounded-lg py-2.5 px-3 text-white focus:border-[#4CE3BC]/50 focus:outline-none [&::-webkit-calendar-picker-indicator]:invert" />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-foreground-subtle uppercase tracking-widest mb-1 block">Payment Terms (Days)</label>
+                  <input 
+                    type="number" 
+                    value={editPaymentTerms} 
+                    onChange={e => setEditPaymentTerms(e.target.value)} 
+                    placeholder="30"
+                    className="w-full bg-[#16171C] border border-white/5 text-sm rounded-lg py-2.5 px-3 text-white focus:border-[#4CE3BC]/50 focus:outline-none" 
+                  />
                 </div>
               </div>
             )}
