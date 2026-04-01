@@ -15,9 +15,7 @@ export default function Dashboard() {
   // Compute Stats
   const today = new Date();
   const totalCollected = revenue.reduce((sum, r) => sum + r.amount, 0);
-  const explicitPending = payments.filter(p => p.status === 'Pending').reduce((sum, p) => sum + p.amount, 0);
-  const deliveredDealsValue = deals.filter(d => d.stage === 'Delivered' && !d.isCompleted).reduce((sum, d) => sum + d.value, 0);
-  const pendingPay = explicitPending + deliveredDealsValue;
+  const pendingPay = payments.filter(p => p.status !== 'Paid').reduce((sum, p) => sum + p.amount, 0);
   
   const activeDealsCount = deals.filter(d => d.stage !== 'Lost' && !d.isCompleted).length;
   const totalDealsCount = deals.length;
@@ -31,7 +29,7 @@ export default function Dashboard() {
   const revenueGap = expectedRevenue - actualRevenue;
 
   // Smart Alerts logic
-  const pendingDealsCount = payments.filter(p => p.status === 'Pending').length + deals.filter(d => d.stage === 'Delivered' && !d.isCompleted).length;
+  const pendingDealsCount = payments.filter(p => p.status !== 'Paid').length;
   const delayedBrands = brands.filter(b => payments.some(p => p.brand === b.name && isOverdue(p)));
 
   // What Should I Do Today? (Actionable Items)

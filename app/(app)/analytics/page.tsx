@@ -72,8 +72,9 @@ export default function AnalyticsPage() {
     : 'None';
 
   // 4. PAYMENT INSIGHTS
-  const pendingMoney = payments.filter(p => p.status === 'Pending').reduce((sum, p) => sum + p.amount, 0);
-  const overdueMoney = payments.filter(p => p.status === 'Overdue').reduce((sum, p) => sum + p.amount, 0);
+  const isOverdue = (p: any) => p.status !== 'Paid' && p.dueDate && new Date(p.dueDate) < now;
+  const pendingMoney = payments.filter(p => p.status !== 'Paid' && !isOverdue(p)).reduce((sum, p) => sum + p.amount, 0);
+  const overdueMoney = payments.filter(isOverdue).reduce((sum, p) => sum + p.amount, 0);
 
   // Modal Render Logic
   const renderInsightModal = () => {
@@ -124,18 +125,21 @@ export default function AnalyticsPage() {
        content = (
           <div className="space-y-3">
              <div className="text-[10px] font-bold text-foreground-muted uppercase tracking-widest mb-4">Pending & Overdue</div>
-             {payments.filter(p => p.status !== 'Paid').map(p => (
-                <div key={p.id} className="flex justify-between items-center p-4 border border-border rounded-xl bg-foreground/[0.02]">
-                   <div>
-                      <div className="font-bold text-sm text-foreground">{p.brand}</div>
-                      <div className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded w-fit mt-1 ${p.status === 'Overdue' ? 'bg-danger-bg text-danger-text border border-danger-text/20' : 'bg-warning-bg text-warning-text border border-warning-text/20'}`}>{p.status}</div>
-                   </div>
-                   <div className="text-right">
-                     <span className={`font-black text-base tracking-tight ${p.status === 'Overdue' ? 'text-danger-text' : 'text-warning-text'}`}>₹{p.amount.toLocaleString()}</span>
-                     <div className="text-[10px] font-bold text-foreground-muted">Due: {formatDateObj(p.dueDate)}</div>
-                   </div>
-                </div>
-             ))}
+             {payments.filter(p => p.status !== 'Paid').map(p => {
+                const over = isOverdue(p);
+                return (
+                  <div key={p.id} className="flex justify-between items-center p-4 border border-border rounded-xl bg-foreground/[0.02]">
+                     <div>
+                        <div className="font-bold text-sm text-foreground">{p.brand}</div>
+                        <div className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded w-fit mt-1 ${over ? 'bg-danger-bg text-danger-text border border-danger-text/20' : 'bg-warning-bg text-warning-text border border-warning-text/20'}`}>{over ? 'Overdue' : 'Pending'}</div>
+                     </div>
+                     <div className="text-right">
+                       <span className={`font-black text-base tracking-tight ${over ? 'text-danger-text' : 'text-warning-text'}`}>₹{p.amount.toLocaleString()}</span>
+                       <div className="text-[10px] font-bold text-foreground-muted">Due: {formatDateObj(p.dueDate)}</div>
+                     </div>
+                  </div>
+                );
+             })}
              {payments.filter(p => p.status !== 'Paid').length === 0 && <div className="text-foreground-muted text-sm text-center p-4 font-medium font-bold uppercase tracking-widest">All invoices settled!</div>}
           </div>
        )

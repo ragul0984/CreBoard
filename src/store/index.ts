@@ -246,8 +246,13 @@ export const useStore = create<AppState>((set, get) => ({
   
   addBrand: async (brand) => {
     const supabase = createClient();
+    const existing = get().brands.find(b => b.name.toLowerCase() === brand.name.toLowerCase());
+    if (existing) {
+       console.log(`🏷️ Brand ${brand.name} already exists, skipping creation.`);
+       return;
+    }
+
     const safeBrand = { ...brand, id: brand.id.includes('_') || brand.id.length < 32 ? crypto.randomUUID() : brand.id };
-    
     set((state) => ({ brands: [...state.brands, safeBrand] }));
     
     await supabase.from('brands').insert([{
@@ -356,7 +361,14 @@ export const useStore = create<AppState>((set, get) => ({
     const dealThatMoved = get().deals.find(d => d.id === id);
     if (!dealThatMoved) return;
 
-    const today = new Date().toISOString().split('T')[0];
+    const toLocalDate = (date: Date) => {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    };
+
+    const today = toLocalDate(new Date());
     const existingPayment = get().payments.find(p => p.dealId === id);
 
     // LOGIC: If PAID -> Generate/Update Payment and Revenue
@@ -369,14 +381,6 @@ export const useStore = create<AppState>((set, get) => ({
           }));
           await supabase.from('payments').update({ status: 'Paid', received_date: today }).eq('id', paymentId);
        } else {
-          const newPaymentRequest = {
-            id: paymentId,
-            deal_id: dealThatMoved.id,
-            amount: dealThatMoved.value,
-            status: 'Paid',
-            due_date: dealThatMoved.deadline,
-            received_date: today
-          };
           set(state => ({
             payments: [{
                 id: paymentId, dealId: dealThatMoved.id, dealName: dealThatMoved.deliverable,
@@ -413,7 +417,7 @@ export const useStore = create<AppState>((set, get) => ({
       const terms = get().paymentTerms || 30;
       const todayDate = new Date();
       todayDate.setDate(todayDate.getDate() + terms);
-      const calculatedDueDate = todayDate.toISOString().split('T')[0];
+      const calculatedDueDate = toLocalDate(todayDate);
 
       if (existingPayment) {
         set(state => ({
@@ -437,23 +441,16 @@ export const useStore = create<AppState>((set, get) => ({
         }]);
       }
     }
-    // LOGIC: Anything else -> Remove Revenue and consider removing Payment
+    // LOGIC: Anything else (To-do, Doing, Ready, Lost) -> Cleanup financial records
     else {
        if (existingPayment) {
           set(state => ({
+            payments: state.payments.filter(p => p.id !== existingPayment.id),
             revenue: state.revenue.filter(r => r.payment_id !== existingPayment.id)
           }));
           await supabase.from('revenue').delete().eq('payment_id', existingPayment.id);
-          
-          // If we move far back (To-do/Doing), maybe delete payment? 
-          // For now let's just keep it pending or delete if it's not a serious stage
-          if (stage === 'To-do' || stage === 'Doing') {
-             set(state => ({ payments: state.payments.filter(p => p.id !== existingPayment.id) }));
-             await supabase.from('payments').delete().eq('id', existingPayment.id);
-          } else {
-             set(state => ({ payments: state.payments.map(p => p.id === existingPayment.id ? { ...p, status: 'Pending', receivedDate: null } : p) }));
-             await supabase.from('payments').update({ status: 'Pending', received_date: null }).eq('id', existingPayment.id);
-          }
+          await supabase.from('payments').delete().eq('id', existingPayment.id);
+          console.log(`🧹 Cleaned up financial records for deal moved back to ${stage}`);
        }
     }
   },
@@ -536,10 +533,8 @@ export const useStore = create<AppState>((set, get) => ({
       revenue: state.revenue.filter(r => r.payment_id !== paymentId)
     }));
 
-    if (paymentId) {
-      await supabase.from('revenue').delete().eq('payment_id', paymentId);
-      await supabase.from('payments').delete().eq('deal_id', id);
-    }
+    await supabase.from('revenue').delete().eq('payment_id', paymentId);
+    await supabase.from('payments').delete().eq('deal_id', id);
     await supabase.from('deals').delete().eq('id', id);
   },
 
