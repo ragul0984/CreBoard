@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { createClient } from '@/src/utils/supabase/client';
 import { ArrowRight, Mail, Lock, Chrome, Github, Sparkles, Loader2, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
+import { useLoading } from '@/src/context/LoadingContext';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -13,12 +14,14 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const { startLoading, stopLoading } = useLoading();
 
   const supabase = createClient();
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    startLoading();
     setError(null);
     setMessage(null);
 
@@ -64,20 +67,26 @@ export default function LoginPage() {
       setError(err.message || 'An error occurred');
     } finally {
       setLoading(false);
+      stopLoading();
     }
   };
 
   const handleGoogleLogin = async () => {
-    // Get the base URL for redirection
-    // window.location.origin is reliable in the browser
+    startLoading();
     const origin = window.location.origin;
     
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${origin}/auth/callback`,
-      },
-    });
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${origin}/auth/callback`,
+        },
+      });
+      if (error) throw error;
+    } catch (err: any) {
+      setError(err.message || 'Failed to initialize Google Login');
+      stopLoading();
+    }
   };
 
   return (

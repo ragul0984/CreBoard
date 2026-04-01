@@ -4,6 +4,7 @@ import { useStore } from '@/src/store';
 import { User, Mail, Shield, BarChart3, Layers, IndianRupee, Bell, ExternalLink, Send, Loader2, Lock, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { createClient } from '@/src/utils/supabase/client';
+import { useLoading } from '@/src/context/LoadingContext';
 
 export default function ProfilePage() {
   const deals = useStore(state => state.deals);
@@ -29,6 +30,7 @@ export default function ProfilePage() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [passwordMessage, setPasswordMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
+  const { startLoading, stopLoading } = useLoading();
 
   const supabase = createClient();
   const userId = useStore(state => state.userId);
@@ -61,12 +63,14 @@ export default function ProfilePage() {
   };
 
   const saveProfile = async () => {
+    startLoading();
     await useStore.getState().updateProfile({ 
       full_name: editName, 
       gender: editGender, 
       dob: editDob 
     });
     setIsEditingProfile(false);
+    stopLoading();
   };
 
   const deleteAccount = async () => {
@@ -74,11 +78,13 @@ export default function ProfilePage() {
     if (confirmText !== 'DELETE') return;
     
     setIsDeleting(true);
+    startLoading();
     const { error } = await supabase.rpc('delete_user_account');
     
     if (error) {
       alert("Failed to delete account: " + error.message);
       setIsDeleting(false);
+      stopLoading();
     } else {
       useStore.getState().clearStore();
       await supabase.auth.signOut();
@@ -100,6 +106,7 @@ export default function ProfilePage() {
       return;
     }
     setIsChangingPassword(true);
+    startLoading();
     setPasswordMessage(null);
 
     const { error } = await supabase.auth.updateUser({ password: newPassword });
@@ -112,6 +119,7 @@ export default function ProfilePage() {
       setConfirmPassword('');
     }
     setIsChangingPassword(false);
+    stopLoading();
   };
 
   const testEmail = async () => {
