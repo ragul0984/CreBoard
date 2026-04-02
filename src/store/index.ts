@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { createClient } from '@/src/utils/supabase/client';
 
 export type Deal = {
@@ -86,7 +87,9 @@ interface AppState {
   }) => Promise<void>;
 }
 
-export const useStore = create<AppState>((set, get) => ({
+export const useStore = create<AppState>()(
+  persist(
+    (set, get) => ({
   isInitialized: false,
   isInitializing: false,
   userId: null,
@@ -114,8 +117,13 @@ export const useStore = create<AppState>((set, get) => ({
       return;
     }
 
-    set({ isInitializing: true });
-    console.log('📦 Calling initializeStore...');
+    const hasCachedData = get().deals.length > 0 || get().brands.length > 0;
+    
+    if (!hasCachedData) {
+      set({ isInitializing: true });
+    }
+    
+    console.log(`📦 Calling initializeStore... (Silent Hydration: ${hasCachedData})`);
     const supabase = createClient();
     
     try {
@@ -589,4 +597,24 @@ export const useStore = create<AppState>((set, get) => ({
 
     await supabase.from('profiles').update(dbUpdates).eq('id', userId);
   }
-}));
+    }),
+    {
+      name: 'creboard-storage',
+      partialize: (state) => ({
+        deals: state.deals,
+        payments: state.payments,
+        revenue: state.revenue,
+        brands: state.brands,
+        contracts: state.contracts,
+        contentTasks: state.contentTasks,
+        billingAddress: state.billingAddress,
+        panGst: state.panGst,
+        upiId: state.upiId,
+        bankAccount: state.bankAccount,
+        bankIfsc: state.bankIfsc,
+        paymentTerms: state.paymentTerms,
+        userName: state.userName,
+      })
+    }
+  )
+);
