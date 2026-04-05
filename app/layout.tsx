@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { LoadingProvider } from "@/src/context/LoadingContext";
 import { SleekLoader } from "@/components/ui/SleekLoader";
 import { Suspense } from "react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "CreBoard",
@@ -26,6 +27,7 @@ export default function RootLayout({
             </ThemeProvider>
           </LoadingProvider>
         </Suspense>
+        <SpeedInsights />
       </body>
     </html>
   );
